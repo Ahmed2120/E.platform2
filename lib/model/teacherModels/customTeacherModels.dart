@@ -9,56 +9,56 @@ import '../../widgets/dialogs/alertMsg.dart';
 mixin CustomTeacherModels on Model{
 
   ///----------Teacher Subject -------------------
-    bool  _teacherLoading=false;
-    bool get  customSubOfTeacherLoading=>_teacherLoading;
+  bool  _teacherLoading=false;
+  bool get  customSubOfTeacherLoading=>_teacherLoading;
 
-    List <CustomModel> _sub=[];
-    List <CustomModel> get  allCustomSubOfTeacher=>_sub;
+  List <CustomModel> _sub=[];
+  List <CustomModel> get  allCustomSubOfTeacher=>_sub;
 
 
-    ///--------educationType-------
-    bool _type_loading =false;
-    bool get customEducationType =>_type_loading;
+  ///--------educationType-------
+  bool _type_loading =false;
+  bool get customEducationType =>_type_loading;
 
-    List <CustomModel> _educationTypes=[];
-    List <CustomModel> get  allCustomEducationType =>_educationTypes;
+  List <CustomModel> _educationTypes=[];
+  List <CustomModel> get  allCustomEducationType =>_educationTypes;
 
-    ///---------EducationPrograms---------
-    bool  _educationProgramsLoading=false;
-    bool get  customEducationProgramsLoading=>_educationProgramsLoading;
+  ///---------EducationPrograms---------
+  bool  _educationProgramsLoading=false;
+  bool get  customEducationProgramsLoading=>_educationProgramsLoading;
 
-    List<CustomModel>_educationPrograms=[];
-    List<CustomModel> get allCustomEducationPrograms=>_educationPrograms;
+  List<CustomModel>_educationPrograms=[];
+  List<CustomModel> get allCustomEducationPrograms=>_educationPrograms;
 
-    ///--------------educationLevels----------
-    bool _level_loading=false;
-    bool get customLevel_loading=>_level_loading;
+  ///--------------educationLevels----------
+  bool _level_loading=false;
+  bool get customLevel_loading=>_level_loading;
 
-    List<CustomModel>_educationLevels=[];
-    List<CustomModel> get allCustomEducationLevels=>_educationLevels;
+  List<CustomModel>_educationLevels=[];
+  List<CustomModel> get allCustomEducationLevels=>_educationLevels;
 
-    ///---------------Country --------
-    bool _country_loading=false;
-    bool get customCountry_loading =>_country_loading;
+  ///---------------Country --------
+  bool _country_loading=false;
+  bool get customCountry_loading =>_country_loading;
 
-    List<CustomModel>_allCountries=[];
-    List<CustomModel> get allSustomTeacherCountries=>_allCountries;
+  List<CustomModel>_allCountries=[];
+  List<CustomModel> get allSustomTeacherCountries=>_allCountries;
 
-    ///-----------Currencies--------------
-    bool _currency_loading=false;
-    bool get customCurrency_loading=>_currency_loading;
+  ///-----------Currencies--------------
+  bool _currency_loading=false;
+  bool get customCurrency_loading=>_currency_loading;
 
-    List<SelectedCurrency>_selectedCurrencies=[];
-    List <SelectedCurrency> get allCustomSelectedCurrencies =>_selectedCurrencies;
+  List<SelectedCurrency>_selectedCurrencies=[];
+  List <SelectedCurrency> get allCustomSelectedCurrencies =>_selectedCurrencies;
 
-    List<SelectedCurrency>_selectedLessonCurrencies=[];
-    List <SelectedCurrency> get allCustomSelectedLessonCurrencies =>_selectedLessonCurrencies;
+  List<SelectedCurrency>_selectedLessonCurrencies=[];
+  List <SelectedCurrency> get allCustomSelectedLessonCurrencies =>_selectedLessonCurrencies;
 
 
   void  fetchSubOfTeacher1()  async{
 
-      _teacherLoading=true;
-        notifyListeners();
+    _teacherLoading=true;
+    notifyListeners();
     Map<String,dynamic> data={
       'teacherId':null
     };
@@ -69,20 +69,20 @@ mixin CustomTeacherModels on Model{
         List body = json.decode(response.body);
         _sub= body.map((e) => CustomModel.fromJson(e)).toList();
 
-          _teacherLoading=false;
-          notifyListeners();
+        _teacherLoading=false;
+        notifyListeners();
       }
       else {
         ShowMyDialog.showMsg(json.decode(response.body)['Message']);
       }
 
-        _teacherLoading=false;
+      _teacherLoading=false;
       notifyListeners();
     }
     catch(e){
 
-        _teacherLoading=false;
-       notifyListeners();
+      _teacherLoading=false;
+      notifyListeners();
       print(' teacher  ee '+e.toString());
     }
   }
@@ -90,8 +90,8 @@ mixin CustomTeacherModels on Model{
   void   fetchTeacherEducationType() async{
 
 
-      _type_loading=true;
-   notifyListeners();
+    _type_loading=true;
+    notifyListeners();
 
     try {
       var response = await CallApi().getData("/api/Teacher/GetTeacherEducationTypes",1);
@@ -107,13 +107,13 @@ mixin CustomTeacherModels on Model{
 
     }
 
-      _type_loading=false;
-     notifyListeners();
+    _type_loading=false;
+    notifyListeners();
   }
 
-  void   fetchTeacherEducationPrograms(CustomModel educationType) async{
+  Future<void>   fetchTeacherEducationPrograms(CustomModel educationType) async{
 
-      _educationProgramsLoading=true;
+    _educationProgramsLoading=true;
 
     Map <String, dynamic>data={
       "educationTypeId" :educationType.Id.toString()
@@ -129,25 +129,26 @@ mixin CustomTeacherModels on Model{
 
       }
 
-        _educationProgramsLoading=false;
-       notifyListeners();
+      _educationProgramsLoading=false;
+      notifyListeners();
     }
     catch(e){
       print ('ee '+e.toString());
-        _educationProgramsLoading=false;
-       notifyListeners();
+      _educationProgramsLoading=false;
+      notifyListeners();
     }
 
   }
 
   void fetchTeacherEducationLevels() async{
 
-      _level_loading=true;
-      notifyListeners();
+    _level_loading=true;
+    notifyListeners();
 
 
     try {
       var response = await CallApi().getData("/api/Teacher/GetTeacherGrades",1);
+
 
       if (response != null && response.statusCode == 200) {
         List body =json.decode(response.body) ;
@@ -160,16 +161,16 @@ mixin CustomTeacherModels on Model{
 
     }
 
-      _level_loading=false;
-       notifyListeners();
+    _level_loading=false;
+    notifyListeners();
 
   }
 
   void   fetchTeacherEducationCountries() async{
 
 
-      _country_loading=true;
-        notifyListeners();
+    _country_loading=true;
+    notifyListeners();
 
     try {
       var response = await CallApi().getData("/api/Country/GetCountries",0);
@@ -184,14 +185,14 @@ mixin CustomTeacherModels on Model{
       //  ShowMyDialog.showSnack(context,'ee '+e.toString());
     }
 
-      _country_loading=false;
-      notifyListeners();
+    _country_loading=false;
+    notifyListeners();
   }
 
   void  fetchTeacherCurrencies(List<CustomModel>countries ) async{
 
     _currency_loading=true;
-       notifyListeners();
+    notifyListeners();
 
     List<int> c=[];
     for(int i=0 ; i <countries.length ;i++){
@@ -199,7 +200,7 @@ mixin CustomTeacherModels on Model{
     }
 
     try {
-    /*  final response = await http.post(
+      /*  final response = await http.post(
           Uri.parse(UserSession.getURL()+'/api/Country/GetCountryCurrencies'),
           body:c.toString(),
           headers: { 'Content-Type': 'application/json',}
@@ -217,15 +218,15 @@ mixin CustomTeacherModels on Model{
         ShowMyDialog.showMsg(json.decode(response.body)['Message']);
       }
 
-        _currency_loading=false;
-         notifyListeners();
+      _currency_loading=false;
+      notifyListeners();
     }
     catch(e){
       print (' currrency ee '+e.toString());
       //  ShowMyDialog.showSnack(context,'ee '+e.toString());
 
-        _currency_loading=false;
-       notifyListeners();
+      _currency_loading=false;
+      notifyListeners();
     }
 
   }

@@ -51,6 +51,10 @@ class _AddNotePageState extends State<AddNotePage> {
   List<CustomModel> _educationPrograms=[];
   List <SelectedCurrency>_selectedCurrencies=[];
 
+  List<CustomModel?> selectedEducationTypeList = [null];
+  List<List<CustomModel>?> curriculumTypeList = [null];
+  List<CustomModel?> selectedCurriculumTypeList = [null];
+
 
 
   TypeGroup typeGroup = TypeGroup.group;
@@ -109,17 +113,66 @@ class _AddNotePageState extends State<AddNotePage> {
             Text('وصف المذكرة', style: Theme.of(context).textTheme.titleMedium, textAlign: TextAlign.right,),
             CustomTextField(controller: _noteDescriptionController, hintText: 'وصف المذكرة', input: TextInputType.text,),
 
-            const SizedBox(height: 5,),
 
-            _type_loading ?Center(child: CircularProgressIndicator()):
-            Text('نوع التعليم', style: Theme.of(context).textTheme.titleMedium, textAlign: TextAlign.right,),
-            CustomDropDown(_educationTypes, changeEducationType, educationType, 'نوع التعليم'),
+            const SizedBox(height: 8,),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: [
+                Text('نوع التعليم', style: Theme.of(context).textTheme.titleMedium, textAlign: TextAlign.right,),
+                Text('نوع المنهج', style: Theme.of(context).textTheme.titleMedium, textAlign: TextAlign.right,),
 
-            const SizedBox(height: 5,),
+              ],
+            ),
 
-            _educationProgramsLoading ?Center(child: CircularProgressIndicator()):
-            Text('نوع المنهج', style: Theme.of(context).textTheme.titleMedium, textAlign: TextAlign.right,),
-            CustomDropDown(_educationPrograms, change_educationPrograms, curriculumType, 'نوع المنهج'),
+            ListView.separated(
+                physics: const NeverScrollableScrollPhysics(),
+                shrinkWrap: true,
+                itemCount: curriculumTypeList.length,
+                separatorBuilder: (context, index)=> const SizedBox(height: 10,),
+                itemBuilder: (context, index) {
+                  return Row(
+                    children: [
+
+                      Expanded(
+                        child: Column(
+                          children: [
+                            _type_loading?const Center(child: CircularProgressIndicator()):
+                            CustomDropDown(_educationTypes, (val){
+                              changeEducationType(val, index);
+                            }, selectedEducationTypeList[index], 'نوع التعليم'),
+
+                          ],
+                        ),
+                      ),
+
+                      const SizedBox(width: 5,),
+                      Expanded(
+                        child: Column(
+                          children: [
+                            CustomDropDown(curriculumTypeList[index]??[],
+                                    (val){
+                                  change_educationPrograms(val, index);
+                                }, selectedCurriculumTypeList[index], 'نوع المنهج'),
+                          ],
+                        ),
+                      ),
+
+                      const SizedBox(width: 10,),
+                      if(index == curriculumTypeList.length - 1)
+                        InkWell(
+                            onTap: ()
+                            {
+                              curriculumTypeList.add(null);
+                              selectedEducationTypeList.add(null);
+                              selectedCurriculumTypeList.add(null);
+                              setState(() {});
+                            },
+                            child: const Icon(Icons.add_circle_sharp,
+                              color: AppColors.primaryColor, size: 40,))
+                    ],
+                  );
+                }
+            ),
 
             const SizedBox(height: 5,),
             _level_loading ?Center(child: CircularProgressIndicator()):
@@ -252,17 +305,20 @@ class _AddNotePageState extends State<AddNotePage> {
 
   }
 
-  changeEducationType(val){
+  changeEducationType(val, int index) async{
     educationType=val;
-    _getEducationPrograms();
+    selectedEducationTypeList[index] = val;
+    await _getEducationPrograms();
+    curriculumTypeList[index] = _educationPrograms;
     curriculumType=null;
     setState(() {
 
     });
   }
 
-  change_educationPrograms(val){
+  change_educationPrograms(val, int index){
     curriculumType=val;
+    selectedCurriculumTypeList[index] = val;
     setState(() {
 
     });
@@ -335,7 +391,7 @@ class _AddNotePageState extends State<AddNotePage> {
     });
   }
 
-  void _getEducationPrograms() async{
+  Future _getEducationPrograms() async{
 
     setState(() {
       _educationProgramsLoading=true;
@@ -503,6 +559,16 @@ class _AddNotePageState extends State<AddNotePage> {
       });
     }
 
+    Map<String, String> types = {};
+    for(int i = 0; i < selectedEducationTypeList.length; i++){
+      if(selectedEducationTypeList[i] != null){
+        types['EducationTypeIds[$i]'] = selectedEducationTypeList[i]!.Id.toString();
+      }
+      if(selectedCurriculumTypeList[i] != null){
+        types['ProgramTypeIds[$i]'] = selectedCurriculumTypeList[i]!.Id.toString();
+      }
+    }
+
     Map<String, String> data={
       "Id": "0",
       "SubjectId": subject!.Id.toString(),
@@ -510,11 +576,12 @@ class _AddNotePageState extends State<AddNotePage> {
       "Description": _noteDescriptionController.text,
       // "Price": 70.0,
       "GradeId": educationLevel!.Id.toString(),
-      "EducationTypeId": educationType!.Id.toString(),
-      "ProgramTypeId": curriculumType!.Id.toString(),
+      // "EducationTypeId": educationType!.Id.toString(),
+      // "ProgramTypeId": curriculumType!.Id.toString(),
       // "NotebookImages": _images,
       "Countries": jsonEncode(_countries),
-      "Prices": jsonEncode(_notePrices)
+      "Prices": jsonEncode(_notePrices),
+      ...types
     };
 
     print(' Note data   '+data.toString());
@@ -523,7 +590,7 @@ class _AddNotePageState extends State<AddNotePage> {
       // var response = await TeacherCall().postData(json.encode(data), "/api/Notebook/AddNotebook", 1);
       var response = await CallApi().postJsonAndFile(data, _images, "/api/Notebook/AddNotebook", 1);
       // var body = json.decode(response.body);
-      // print ('body '+body.toString());
+      print ('body '+ await response.stream.bytesToString());
 
       if (response != null && response.statusCode == 200) {
 

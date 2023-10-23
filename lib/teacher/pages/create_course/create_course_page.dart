@@ -59,6 +59,10 @@ class _CreateCoursePageState extends State<CreateCoursePage> {
   List <SelectedCurrency>_selectedLessonCurrencies=[];
   List<CustomModel> _sub=[];
 
+  List<CustomModel?> selectedEducationTypeList = [null];
+  List<List<CustomModel>?> curriculumTypeList = [null];
+  List<CustomModel?> selectedCurriculumTypeList = [null];
+
 
 
   bool _type_loading=false;
@@ -315,34 +319,99 @@ class _CreateCoursePageState extends State<CreateCoursePage> {
               ),
             ),
 
-            const SizedBox(height: 15,),
+            // const SizedBox(height: 15,),
+            // Row(
+            //   children: [
+            //     Expanded(child: Column(
+            //       children: [
+            //         Text('نوع التعليم', style: Theme.of(context).textTheme.titleMedium, textAlign: TextAlign.right,),
+            //         _type_loading?const Center(child: CircularProgressIndicator()):
+            //         CreateCourseDropDown(_educationTypes, changeEducationType, educationType, 'النوع'),
+            //       ],
+            //     ),),
+            //     const SizedBox(width: 8,),
+            //     Expanded(child: Column(
+            //       children: [
+            //         Text('نوع المنهج ', style: Theme.of(context).textTheme.titleMedium, textAlign: TextAlign.right,),
+            //       _educationProgramsLoading?const Center(child: CircularProgressIndicator()):
+            //         CreateCourseDropDown(_educationPrograms, change_educationPrograms, curriculumType, 'المنهج'),
+            //       ],
+            //     ),),
+            //     const SizedBox(width: 8,),
+            //     Expanded(child: Column(
+            //       children: [
+            //         Text('المرحلة الدراسية', style: Theme.of(context).textTheme.titleMedium, textAlign: TextAlign.right,),
+            //         _level_loading?const Center(child: CircularProgressIndicator()):
+            //         CreateCourseDropDown(_educationLevels, selectLevel, educationLevel, 'المرحلة'),
+            //       ],
+            //     ),),
+            //   ],
+            // ),
+            const SizedBox(height: 8,),
             Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
-                Expanded(child: Column(
-                  children: [
-                    Text('نوع التعليم', style: Theme.of(context).textTheme.titleMedium, textAlign: TextAlign.right,),
-                    _type_loading?const Center(child: CircularProgressIndicator()):
-                    CreateCourseDropDown(_educationTypes, changeEducationType, educationType, 'النوع'),
-                  ],
-                ),),
-                const SizedBox(width: 8,),
-                Expanded(child: Column(
-                  children: [
-                    Text('نوع المنهج ', style: Theme.of(context).textTheme.titleMedium, textAlign: TextAlign.right,),
-                  _educationProgramsLoading?const Center(child: CircularProgressIndicator()):
-                    CreateCourseDropDown(_educationPrograms, change_educationPrograms, curriculumType, 'المنهج'),
-                  ],
-                ),),
-                const SizedBox(width: 8,),
-                Expanded(child: Column(
-                  children: [
-                    Text('المرحلة الدراسية', style: Theme.of(context).textTheme.titleMedium, textAlign: TextAlign.right,),
-                    _level_loading?const Center(child: CircularProgressIndicator()):
-                    CreateCourseDropDown(_educationLevels, selectLevel, educationLevel, 'المرحلة'),
-                  ],
-                ),),
+                Text('نوع التعليم', style: Theme.of(context).textTheme.titleMedium, textAlign: TextAlign.right,),
+                Text('نوع المنهج', style: Theme.of(context).textTheme.titleMedium, textAlign: TextAlign.right,),
+
               ],
             ),
+
+            ListView.separated(
+                physics: const NeverScrollableScrollPhysics(),
+                shrinkWrap: true,
+                itemCount: curriculumTypeList.length,
+                separatorBuilder: (context, index)=> const SizedBox(height: 10,),
+                itemBuilder: (context, index) {
+                  return Row(
+                    children: [
+
+                      Expanded(
+                        child: Column(
+                          children: [
+                            _type_loading?const Center(child: CircularProgressIndicator()):
+                            CreateCourseDropDown(_educationTypes, (val){
+                              changeEducationType(val, index);
+                            }, selectedEducationTypeList[index], 'نوع التعليم'),
+
+                          ],
+                        ),
+                      ),
+
+                      const SizedBox(width: 5,),
+                      Expanded(
+                        child: Column(
+                          children: [
+                            CreateCourseDropDown(curriculumTypeList[index]??[],
+                                    (val){
+                                  change_educationPrograms(val, index);
+                                }, selectedCurriculumTypeList[index], 'نوع المنهج'),
+                          ],
+                        ),
+                      ),
+
+                      const SizedBox(width: 10,),
+                      if(index == curriculumTypeList.length - 1)
+                        InkWell(
+                            onTap: ()
+                            {
+                              curriculumTypeList.add(null);
+                              selectedEducationTypeList.add(null);
+                              selectedCurriculumTypeList.add(null);
+                              setState(() {});
+                            },
+                            child: const Icon(Icons.add_circle_sharp,
+                              color: AppColors.primaryColor, size: 40,))
+                    ],
+                  );
+                }
+            ),
+
+            const SizedBox(height: 8,),
+
+            Text('المرحلة الدراسية', style: Theme.of(context).textTheme.titleMedium, textAlign: TextAlign.right,),
+            _level_loading?const Center(child: CircularProgressIndicator()):
+            CreateCourseDropDown(_educationLevels, selectLevel, educationLevel, 'المرحلة'),
 
             const SizedBox(height: 20,),
             _Loading?const Center(child: CircularProgressIndicator()):
@@ -385,17 +454,20 @@ class _CreateCoursePageState extends State<CreateCoursePage> {
     });
 
   }
-  changeEducationType(val){
+  changeEducationType(val, int index) async{
     educationType=val;
-    _getEducationPrograms();
+    selectedEducationTypeList[index] = val;
+    await _getEducationPrograms();
+    curriculumTypeList[index] = _educationPrograms;
     curriculumType=null;
     setState(() {
 
     });
   }
 
-  change_educationPrograms(val){
+  change_educationPrograms(val, int index){
     curriculumType=val;
+    selectedCurriculumTypeList[index] = val;
     setState(() {
 
     });
@@ -484,7 +556,7 @@ class _CreateCoursePageState extends State<CreateCoursePage> {
       _type_loading=false;
     });
   }
-  void _getEducationPrograms() async{
+  Future _getEducationPrograms() async{
 
     setState(() {
       _educationProgramsLoading=true;
@@ -660,18 +732,29 @@ class _CreateCoursePageState extends State<CreateCoursePage> {
       _courseCountries.add( {'CountryId':countries[i].Id });
     }
 
+    List educationTypeIds = [];
+    List programTypeIds = [];
+    Map<String, String> types = {};
+    for(int i = 0; i < selectedEducationTypeList.length; i++){
+      if(selectedEducationTypeList[i] != null){
+        educationTypeIds.add( selectedEducationTypeList[i]!.Id);
+      }
+      if(selectedCurriculumTypeList[i] != null){
+        programTypeIds.add(selectedCurriculumTypeList[i]!.Id);
+      }
+    }
 
     Map data={
       "Id": 0,
       "Title": _courseTitleController.text,
       "SubjectId": subject!.Id,
       "GradeId": educationLevel!.Id,
-      "EducationTypeId": educationType!.Id,
-      "ProgramTypeId": curriculumType!.Id,
+      "EducationTypeIds": educationTypeIds,
+      "ProgramTypeIds": programTypeIds,
       "CourseCountries": _courseCountries,
-      "CoursePrices":_courcePrices
+      "CoursePrices":_courcePrices,
     };
-    //  print('data   '+data.toString());
+     print('data   '+data.toString());
     try {
       var response = await TeacherCall().postData(json.encode(data), "/api/Course/AddCourse", 1);
       var body = json.decode(response.body);
