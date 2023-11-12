@@ -331,13 +331,18 @@ import 'update_teacher_profile_page.dart';
     Map <String,dynamic> data={
       'userId':session['userId']
     };
+    final apiLink = UserSession.userRole == '2' ? '/api/Teacher/GetTeacherProfile' : '/api/Assistant/GetAssistantProfile';
 
     try {
-      var response = await CallApi().getWithBody(data,"/api/Teacher/GetTeacherProfile",1);
+      var response = await CallApi().getWithBody(data,apiLink,1);
+      print('=================-===============');
+      print(apiLink);
+      print(response.body);
 
       var body = json.decode(response.body);
       if (response != null && response.statusCode == 200) {
-        // print(body[0]['Student'].toString());
+        print('=================-===============');
+        print(body);
         List e=body['EducationTypes'];
         List g=body['Grades'];
           print('Student body  '+e.toString());
@@ -433,7 +438,7 @@ import 'update_teacher_profile_page.dart';
       var response =
       await CallApi().postFile(img, "/api/Account/UpdateProfileImage", 1);
       if (response.statusCode == 200) {
-        // print(await response.stream.bytesToString());
+        print(await response.stream.bytesToString());
         final msg = jsonDecode(await response.stream.bytesToString());
         if (!mounted) return;
         ShowMyDialog.showSnack(context, msg['Message'].toString());

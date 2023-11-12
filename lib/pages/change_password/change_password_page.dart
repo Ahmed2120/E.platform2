@@ -7,17 +7,25 @@ import '../../session/userSession.dart';
 import '../components/custom_elevated_button.dart';
 import 'components/change_password_field.dart';
 
-class ChangePasswordPage extends StatelessWidget {
+class ChangePasswordPage extends StatefulWidget {
   ChangePasswordPage({ required this.phoneNumber});
 
   final String phoneNumber;
 
+  @override
+  State<ChangePasswordPage> createState() => _ChangePasswordPageState();
+}
+
+class _ChangePasswordPageState extends State<ChangePasswordPage> {
   final _formKey = GlobalKey<FormState>();
 
   final _passwordController = TextEditingController();
-  final _confirmPasswordController = TextEditingController();
-  bool _login_loading=false;
 
+  final _confirmPasswordController = TextEditingController();
+
+  bool _login_loading=false;
+  bool hidePassword=true;
+  bool hideConfirmPassword=true;
 
   @override
   Widget build(BuildContext context) {
@@ -48,9 +56,9 @@ class ChangePasswordPage extends StatelessWidget {
                   key: _formKey,
                   child: Column(
                     children: [
-                      ChangePasswordField(controller: _passwordController, hintText: 'كلمة المرور',),
+                      ChangePasswordField(controller: _passwordController, hintText: 'كلمة المرور', hidePassword: hidePassword, togglePass: togglePass,),
                       const SizedBox(height: 12,),
-                      ChangePasswordField(controller: _confirmPasswordController, hintText: 'تاكيد كلمة المرور', isConfirmPassword: true, passwordController: _passwordController,),
+                      ChangePasswordField(controller: _confirmPasswordController, hintText: 'تاكيد كلمة المرور', isConfirmPassword: true, passwordController: _passwordController, hidePassword: hideConfirmPassword, togglePass: toggleConfirmPass,),
                     ],
                   ),
                 );
@@ -85,5 +93,18 @@ class ChangePasswordPage extends StatelessWidget {
         ),
       )),
     );
+  }
+
+  togglePass(){
+    hidePassword = !hidePassword;
+    setState(() {
+    });
+
+  }
+  toggleConfirmPass(){
+    hideConfirmPassword = !hideConfirmPassword;
+    setState(() {
+    });
+
   }
 }

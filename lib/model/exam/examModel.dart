@@ -25,7 +25,8 @@ mixin ExamModel on Model{
 
     try {
       var response = await CallApi().getWithBody(data, "/api/Exam/GetExams", 1);
-      //   print(json.decode(response.body));
+        print('kkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkk');
+        print(json.decode(response.body));
       if (response != null && response.statusCode == 200) {
         var body = json.decode(response.body);
         List passed=body['PassedExams'];

@@ -60,7 +60,7 @@ class TeacherFeatures extends StatelessWidget {
               onTap: () => GlobalMethods.navigate(
                   context, CoursesManagementPage(model: model)),
               img: 'assets/icons/online-learning 2.png'),
-          feature(deviceSize,
+          if(UserSession.userRole == '2')feature(deviceSize,
               title: 'ادارة  المساعدين',
               onTap: () =>
                   GlobalMethods.navigate(context, AssistantManagementPage(model: model,)),

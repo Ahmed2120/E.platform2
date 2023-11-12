@@ -33,7 +33,7 @@ mixin TeacherExamModel on Model{
     try {
       var response = await CallApi().getWithBody(data,"/api/Exam/ShowAllExams", 1);
 
-     //  print ("EXams   "+response.body);
+      print ("EXams   "+response.body);
       if (response != null && response.statusCode == 200) {
         List body = json.decode(response.body);
 

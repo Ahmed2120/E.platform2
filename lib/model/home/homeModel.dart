@@ -93,7 +93,8 @@ mixin HomeModel on Model{
       var response = await CallApi().getData( "/api/Blog/GetLatestBlog", 1);
       if (response != null && response.statusCode == 200) {
         List body = json.decode(response.body);
-       // print('object '+body.toString());
+       print('-----------------0000000000--------------------');
+       print('object '+body.toString());
         _homeBlogs = body.map((e) => CustomHome.fromJson(e)).toList();
         notifyListeners();
       }

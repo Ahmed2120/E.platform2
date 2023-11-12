@@ -197,7 +197,7 @@ class _SchoolPageState extends State<SchoolPage> {
       if (response != null && response.statusCode == 200) {
              setState(() {
                    body = json.decode(response.body);
-                   List p=body['SchoolPictures'];
+                   List p=body['SchoolImages'];
                    _shool_pictures=p.map((e) => SchoolPicture.fromJson(e)).toList();
 
                    _name=body['Name'];

@@ -88,7 +88,7 @@ class _TeacherMorePageState extends State<TeacherMorePage> {
                     crossAxisCount: 2,
                     children: [
                       InkWell(
-                          onTap: ()=> GlobalMethods.navigate(context, TeacherWalletPage(walletValue: _walletValue!,)),
+                          onTap: ()=> GlobalMethods.navigate(context, TeacherWalletPage(walletValue: _walletValue!, model: model,)),
                           child: buildContainer('المحفظة', 'assets/images/wallet 1.png', context)),
                       InkWell(
                           onTap: ()=> GlobalMethods.navigate(context, CoursesManagementPage(model: model)),

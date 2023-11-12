@@ -32,6 +32,7 @@ import 'teacherModels/teacherNoteModel.dart';
 import 'teacherModels/teacherSubModel.dart';
 import 'teacherModels/teacher_examDetails_model.dart';
 import 'updateProfileModel.dart';
+import 'wallet/wallet_model.dart';
 
 class MainModel extends Model with CountryModel,SubModel,
     LoginModel,
@@ -42,7 +43,7 @@ class MainModel extends Model with CountryModel,SubModel,
     ExamModel,TeacherHomeModel,TeacherSubModel,CustomTeacherModels,TeacherCreatedNoteModel,
     TeacherCreatedGroupModel, CreatedTeacherCoursesModel,TeacherExamModel,
     TeacherGroupSessionsANDStudentModel, TeacherExamDetailsModel, QuestionModel,
-    AssistantModel, AdvertisingModel
+    AssistantModel, AdvertisingModel, WalletModel
 {
 
 }

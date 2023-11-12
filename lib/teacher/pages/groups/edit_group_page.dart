@@ -51,6 +51,17 @@ class _EditGroupPageState extends State<EditGroupPage> {
 
   List<Map<String, dynamic>> days=[];
 
+  List<CustomModel?> selectedEducationTypeList = [null];
+  List<List<CustomModel>?> curriculumTypeList = [null];
+  List<CustomModel?> selectedCurriculumTypeList = [null];
+  List<List<CustomModel>?> gradesList = [null];
+  List<CustomModel?> selectedGradesList = [null];
+  List<List<CustomModel>?> subjectList = [null];
+  List<CustomModel?> selectedSubjectList = [null];
+
+  List<CustomModel> _sub=[];
+  List<CustomModel> _educationLevels=[];
+
 
 
    List <CustomModel>_days=[
@@ -89,6 +100,8 @@ class _EditGroupPageState extends State<EditGroupPage> {
 
   bool _dataLoading=false;
   bool _currency_loading=false;
+  bool _subLoading=false;
+  bool _level_loading=false;
 
   List _GroupPrices=[];
 
@@ -98,9 +111,7 @@ class _EditGroupPageState extends State<EditGroupPage> {
     // TODO: implement initState
     super.initState();
 
-    widget.model.fetchSubOfTeacher1();
     widget.model.fetchTeacherEducationType();
-    widget.model.fetchTeacherEducationLevels();
     widget.model.fetchTeacherEducationCountries();
 
     _getgroupData();
@@ -129,26 +140,79 @@ class _EditGroupPageState extends State<EditGroupPage> {
 
                 const SizedBox(height: 5,),
 
-                Text('اسم المادة', style: Theme.of(context).textTheme.titleMedium, textAlign: TextAlign.right,),
-                model.customSubOfTeacherLoading?const Center(child: CircularProgressIndicator()):
-                CustomDropDown(model.allCustomSubOfTeacher, changeSubject, subject, 'المادة'),
-                const SizedBox(height: 5,),
+                ListView.separated(
+                    physics: const NeverScrollableScrollPhysics(),
+                    shrinkWrap: true,
+                    itemCount: curriculumTypeList.length,
+                    separatorBuilder: (context, index)=> const SizedBox(height: 10,),
+                    itemBuilder: (context, index) {
+                      return Row(
+                        children: [
+                          Expanded(
+                            child: Column(
+                              children: [
+                                Row(
+                                  children: [
+                                    Expanded(
+                                      child: CustomDropDown(model.allCustomEducationType, (val){
+                                        changeEducationType(val, index);
+                                      }, selectedEducationTypeList[index], 'نوع التعليم'),
+                                    ),
 
-                Text('نوع التعليم', style: Theme.of(context).textTheme.titleMedium, textAlign: TextAlign.right,),
-                model.customEducationType?const Center(child: CircularProgressIndicator()):
-                CustomDropDown(model.allCustomEducationType, changeEducationType, educationType, 'نوع التعليم'),
+                                    const SizedBox(width: 5,),
+                                    if(curriculumTypeList[index] != null && curriculumTypeList[index]!.isNotEmpty)
+                                      Expanded(
+                                        child: CustomDropDown(curriculumTypeList[index]!,
+                                                (val){
+                                              change_educationPrograms(val, index);
+                                            }, selectedCurriculumTypeList[index], 'نوع المنهج'),
+                                      ),
+                                  ],
+                                ),
+                                const SizedBox(height: 5,),
+                                Row(
+                                  children: [
+                                    if(gradesList[index] != null && gradesList[index]!.isNotEmpty)
+                                      Expanded(
+                                        child: CustomDropDown(gradesList[index]!, (val){
+                                          changeEducationLevel(val, index);
+                                        }, selectedGradesList[index], 'السنة الدراسية'),
+                                      ),
 
-                const SizedBox(height: 5,),
+                                    const SizedBox(width: 5,),
+                                    if(subjectList[index] != null && subjectList[index]!.isNotEmpty)
+                                      Expanded(
+                                        child: CustomDropDown(subjectList[index]!,
+                                                (val){
+                                              changeSubject(val, index);
+                                            }, selectedSubjectList[index], 'المادة'),
+                                      ),
+                                  ],
+                                )
+                              ],
+                            ),
+                          ),
 
-                Text('نوع المنهج', style: Theme.of(context).textTheme.titleMedium, textAlign: TextAlign.right,),
-                model.customEducationProgramsLoading?const Center(child: CircularProgressIndicator())
-                    :CustomDropDown(model.allCustomEducationPrograms, change_educationPrograms, curriculumType, 'نوع المنهج'),
-                const SizedBox(height: 5,),
-
-                Text('المرحلة الدراسية', style: Theme.of(context).textTheme.titleMedium, textAlign: TextAlign.right,),
-                model.customLevel_loading ?const Center(child: CircularProgressIndicator()):
-                CustomDropDown(model.allCustomEducationLevels, selectLevel,educationLevel, 'المرحلة الدراسية'),
-
+                          const SizedBox(width: 10,),
+                          if(index == curriculumTypeList.length - 1)
+                            InkWell(
+                                onTap: ()
+                                {
+                                  curriculumTypeList.add(null);
+                                  selectedEducationTypeList.add(null);
+                                  selectedCurriculumTypeList.add(null);
+                                  gradesList.add(null);
+                                  selectedGradesList.add(null);
+                                  subjectList.add(null);
+                                  selectedSubjectList.add(null);
+                                  setState(() {});
+                                },
+                                child: const Icon(Icons.add_circle_sharp,
+                                  color: AppColors.primaryColor, size: 40,))
+                        ],
+                      );
+                    }
+                ),
                 const SizedBox(height: 5,),
 
                 model.customCountry_loading?const Center(child: CircularProgressIndicator()):
@@ -426,8 +490,9 @@ class _EditGroupPageState extends State<EditGroupPage> {
         ),
       );
 
-  changeSubject(val){
-    subject = val;
+  changeSubject(val, int index){
+    // curriculumType=val;
+    selectedSubjectList[index] = val;
     setState(() {
 
     });
@@ -438,12 +503,7 @@ class _EditGroupPageState extends State<EditGroupPage> {
 
     });
   }
-  selectLevel(val){
-    educationLevel=val;
-    setState(() {
 
-    });
-  }
   selectPeriod(val){
     period=val;
     setState(() {
@@ -458,21 +518,42 @@ class _EditGroupPageState extends State<EditGroupPage> {
     });
 
   }
-  changeEducationType(val){
+
+  changeEducationType(val, int index) async{
     educationType=val;
-    widget.model.fetchTeacherEducationPrograms(educationType!);
-    curriculumType=null;
+    selectedEducationTypeList[index] = val;
+    await widget.model.fetchTeacherEducationPrograms(educationType!);
+    curriculumTypeList[index] = widget.model.allCustomEducationPrograms;
+
+    if(curriculumTypeList[index]!.isEmpty){
+      await _get_educationLevels(selectedEducationTypeList[index]!.Id, null);
+      gradesList[index] = _educationLevels;
+    }
+    setState(() {
+
+    });
+  }
+  change_educationPrograms(val, int index)async{
+    selectedCurriculumTypeList[index] = val;
+
+    await _get_educationLevels(selectedEducationTypeList[index]!.Id, selectedCurriculumTypeList[index]!.Id);
+    gradesList[index] = _educationLevels;
+
     setState(() {
 
     });
   }
 
-  change_educationPrograms(val){
-    curriculumType=val;
-    setState(() {
+  changeEducationLevel(val, int index) async{
 
+    selectedGradesList[index] = val;
+    await _getSubOfTeacher(selectedEducationTypeList[index]!.Id, selectedGradesList[index]!.Id, selectedCurriculumTypeList[index]?.Id);
+    subjectList[index] = _sub;
+    setState(() {
     });
+
   }
+
 
   Future<TimeOfDay?> selectTime() async{
     final newTime = await showTimePicker(context: context,
@@ -514,13 +595,30 @@ class _EditGroupPageState extends State<EditGroupPage> {
 
     }
 
+    Map<String, String> types = {};
+    for(int i = 0; i < selectedEducationTypeList.length; i++){
+      if(selectedEducationTypeList[i] != null){
+        types['EducationTypeIds[$i]'] = selectedEducationTypeList[i]!.Id.toString();
+
+      }
+      if(selectedCurriculumTypeList[i] != null){
+        types['ProgramTypeIds[$i]'] = selectedCurriculumTypeList[i]!.Id.toString();
+      }
+      if(selectedGradesList[i] != null){
+        types['GradeIDs[$i]'] = selectedGradesList[i]!.Id.toString();
+      }
+      if(selectedSubjectList[i] != null){
+        types['SubjectIDs[$i]'] = selectedSubjectList[i]!.Id.toString();
+      }
+    }
+
     Map<String, String> data={
       "Id": widget.groupId.toString(),
       "Title": _groupNameController.text,
-      "SubjectId": subject!.Id.toString(),
-      "GradeId": educationLevel!.Id.toString(),
-      "EducationTypeId": educationType!.Id.toString(),
-      "ProgramTypeId": curriculumType!.Id.toString(),
+      // "SubjectId": subject!.Id.toString(),
+      // "GradeId": educationLevel!.Id.toString(),
+      // "EducationTypeId": educationType!.Id.toString(),
+      // "ProgramTypeId": curriculumType!.Id.toString(),
       "StudentsCount": _studentsNumController.text,
       "SessionsCount": _classesNumController.text,
       "Period": period!.Id.toString(),
@@ -529,7 +627,8 @@ class _EditGroupPageState extends State<EditGroupPage> {
       "EndedAt": _endDateTime.toString(),
       "Appointments": jsonEncode(_daysAndTime),
       "Countries": jsonEncode(_GroupCountries),
-      "Prices": jsonEncode(_GroupPrices)
+      "Prices": jsonEncode(_GroupPrices),
+      ...types
     };
     print('data   '+data.toString());
     List<Map> files= [
@@ -699,6 +798,72 @@ class _EditGroupPageState extends State<EditGroupPage> {
       });
     }
 
+  }
+
+  Future _getSubOfTeacher(int educationTypeId, int gradeId, int? programTypeId)  async{
+    setState(() {
+      _subLoading=true;
+    });
+    Map <String, dynamic>data={
+      "educationTypeId" : educationTypeId.toString(),
+      "gradeId" : gradeId.toString(),
+      "programTypeId" : programTypeId.toString()
+    };
+    try {
+      var response = await CallApi().getWithBody(data,
+          "/api/Subject/GetSubjects",0);
+      print(json.decode(response.body));
+      if (response != null && response.statusCode == 200) {
+        List body = json.decode(response.body);
+        _sub= body.map((e) => CustomModel.fromJson(e)).toList();
+        setState(() {
+          _subLoading=false;
+        });
+      }
+      else {
+        ShowMyDialog.showMsg(json.decode(response.body)['Message']);
+      }
+      setState(() {
+        _subLoading=false;
+      });
+    }
+    catch(e){
+      setState(() {
+        _subLoading=false;
+      });
+      print(' sub  ee '+e.toString());
+    }
+  }
+
+  Future _get_educationLevels(int educationTypeId, int? programTypeId) async{
+
+    setState(() {
+      _level_loading=true;
+    });
+
+    Map <String, dynamic>data={
+      "educationTypeId" :educationTypeId.toString(),
+      "programTypeId" : programTypeId.toString()
+    };
+
+    try {
+      var response = await CallApi().getWithBody(data,
+          "/api/Grade/GetGradesByEducationProgramType",0);
+
+      if (response != null && response.statusCode == 200) {
+        List body =json.decode(response.body) ;
+        _educationLevels=body.map((e) => CustomModel.fromJson(e)).toList();
+
+      }
+    }
+    catch(e){
+      print ('ee '+e.toString());
+      ShowMyDialog.showSnack(context,'ee '+e.toString());
+      //   ShowMyDialog.showMsg(context,'ee '+e.toString());
+    }
+    setState(() {
+      _level_loading=false;
+    });
   }
 
   chooseTeacher(SuggestedTeacher suggestedTeacher){

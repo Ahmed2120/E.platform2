@@ -40,7 +40,7 @@ mixin TeacherCreatedNoteModel on Model{
     };
     try {
       var response = await CallApi().getWithBody(data,"/api/Notebook/GetTeacherCreatedNotebooks", 1);
-     //  print ("notes   "+response.body);
+      print ("notes   "+response.body);
       if (response != null && response.statusCode == 200) {
         List body = json.decode(response.body);
         _teacherNoteList = body.map((e) => TeacherCreatedNote.fromJson(e)).toList();

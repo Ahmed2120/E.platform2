@@ -23,14 +23,40 @@ class AddAssistantPage extends StatefulWidget {
 
 class _AddAssistantPageState extends State<AddAssistantPage> {
   List<Authorization> authorizations = [
-    Authorization(1, 'اضافة طالب ', false),
-    Authorization(1, 'حذف طالب ', false),
-    Authorization(2, 'اضافة ولي امر ', false),
-    Authorization(3, 'حذف ولي امر  ', false),
-    Authorization(4, 'لغة عربية  ', false),
-    Authorization(5, 'رياضيات', false),
-    Authorization(6, 'منهج مصري', false),
-    Authorization(7, 'منهج كويتي', false),
+    Authorization(1, 'انشاء كورس ', false),
+    Authorization(2, 'تعديل كورس ', false),
+    Authorization(3, 'حذف كورس ', false),
+    Authorization(4, 'انشاء مجموعة  ', false),
+    Authorization(5, 'تعديل مجموعة', false),
+    Authorization(6, 'حذف مجموعة', false),
+    Authorization(7, 'انشاء اختبار', false),
+    Authorization(8, 'تعديل اختبار', false),
+    Authorization(9, 'حذف اختبار', false),
+    Authorization(11, 'تصحيح اختبار', false),
+    Authorization(12, 'انشاء لايف', false),
+    Authorization(13, 'تعديل لايف', false),
+    Authorization(15, 'حذف لايف', false),
+    Authorization(16, 'انشاء مذكرة', false),
+    Authorization(17, 'تعديل مذكرة', false),
+    Authorization(18, 'حذف مذكرة', false),
+    Authorization(19, 'انشاء الواجب', false),
+    Authorization(20, 'تعديل الواجب', false),
+    Authorization(21, 'حذف الواجب', false),
+    Authorization(22, 'تصحيح الواجب', false),
+    Authorization(23, 'انشاء الاسئلة', false),
+    Authorization(24, 'تعديل الاسئلة', false),
+    Authorization(25, 'حذف الاسئلة', false),
+    Authorization(26, 'انشاء ولي امر ', false),
+    Authorization(27, 'حذف ولي امر', false),
+    Authorization(28, 'انشاء طالب', false),
+    Authorization(29, 'حذف طالب', false),
+    Authorization(30, 'انشاء شات مجموعة', false),
+    Authorization(31, 'انشاء شات خاص', false),
+    Authorization(32, 'مشاهدة درجات الطلاب', false),
+    Authorization(33, 'اداء الهام', false),
+    Authorization(34, 'انشاء التحديات', false),
+    Authorization(35, 'تعديل التحديات', false),
+    Authorization(36, 'حذف التحديات', false),
   ];
 
   List<Map<String, int>> priviliges = [];
@@ -158,7 +184,7 @@ class _AddAssistantPageState extends State<AddAssistantPage> {
                         for (var e in authorizations) {
                           if (e.isActive)
                             priviliges
-                                .add({'AssistantId': 1, 'PriviligeId': e.id});
+                                .add({'AssistantId': widget.assistantId, 'PriviligeId': e.id});
                         }
 model.addTeacherAssistantPrivilige(assistantId: widget.assistantId, priviliges: priviliges);
                         print(priviliges);

@@ -41,7 +41,7 @@ mixin CreatedTeacherCoursesModel on Model{
 
     try {
       var response = await CallApi().getWithBody(data,"/api/Course/ShowTeacherAllCourses", 1);
-    //   print ("courses "+response.body);
+      print ("courses "+response.body);
       if (response != null && response.statusCode == 200) {
         List body = json.decode(response.body);
 

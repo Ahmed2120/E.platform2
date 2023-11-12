@@ -87,6 +87,7 @@ class _EditLessonPageState extends State<EditLessonPage> {
   };
 
   List attachments = [null];
+  List videos = [null];
 
   final _lessonNameController = TextEditingController();
   final _videoNameController = TextEditingController();
@@ -211,28 +212,46 @@ class _EditLessonPageState extends State<EditLessonPage> {
                       style: Theme.of(context).textTheme.titleMedium,
                       textAlign: TextAlign.right,
                     ),
-                    InkWell(
-                      onTap: () async {
-                        final picked = await ImagePicker().pickVideo(source: ImageSource.gallery);
-                        if (picked == null) return;
+                    ListView.builder(
+                      physics: const NeverScrollableScrollPhysics(),
+                      shrinkWrap: true,
+                      itemCount: videos.length,
+                      itemBuilder: (context, index)=>
+                          Row(
+                            children: [
+                              Container(
+                                margin: const EdgeInsets.only(bottom: 8),
+                                width: 130,
+                                child: InkWell(
+                                  onTap: () async{
+                                    final picked = await ImagePicker().pickVideo(source: ImageSource.gallery);
+                                    if(picked == null) return;
+                                    videos[index] = picked;
+                                    setState(() {});
+                                  },
+                                  child: CustomDottedBorder(
+                                    child: Column(
+                                      children: [
+                                        Image.asset('assets/images/promo.png'),
+                                        Text(videos[index] != null ? basename(videos[index].path)
+                                            : 'رفع فيديو', style: const TextStyle(fontSize: 14),),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(width: 15,),
+                              if(index == videos.length - 1)
+                                InkWell(
+                                    onTap: (){
+                                      videos.add(null);
+                                      setState(() {});
+                                    },
 
-                        final controller = VideoPlayerController.file(File(picked.path));
-                        controller.initialize().then((_) {
-                          // Get the duration of the video.
-                          videoDuration = controller.value.duration.inMinutes.toString().padLeft(2, '0') + ":" + controller.value.duration.inSeconds.toString().padLeft(2, '0');
-                        });
-
-                        courseFiles['video'] = picked;
-                      },
-                      child: CustomDottedBorder(
-                        child: Column(
-                          children: [
-                            Image.asset('assets/images/promo.png'),
-                            Text(courseFiles['video'] != null ? basename(courseFiles['video'].path)
-                                : 'رفع فيديو', style: const TextStyle(fontSize: 14),),
-                          ],
-                        ),
-                      ),
+                                    child: const Icon(Icons.add_circle_sharp, color: AppColors.primaryColor, size: 60,))
+                            ],
+                          )
+                      ,
                     ),
                     const SizedBox(
                       height: 8,
@@ -347,8 +366,8 @@ class _EditLessonPageState extends State<EditLessonPage> {
 
       if (response != null && response.statusCode == 200) {
         _lessonNameController.text = body['Title'];
-        _videoNameController.text = body['VideoTitle'];
-        _videoDescController.text = body['VideoDescription'];
+        _videoNameController.text = body['VideoTitle']??'';
+        _videoDescController.text = body['VideoDescription']??'';
         _isFree = body['Free'];
 
         _LessonPrices = body['CourseLessonPrices'];
@@ -382,7 +401,13 @@ class _EditLessonPageState extends State<EditLessonPage> {
 
     List<String> AttachmentUrl = [];
     for (int i = 0; i < attachments.length; i++) {
+      if(attachments[i] == null) continue;
       AttachmentUrl.add(attachments[i].path);
+    }
+    List<String>  VidetUrl  =[];
+    for(int i=0;i<videos.length;i++){
+      if(videos[i] == null) continue;
+      VidetUrl.add( videos[i].path);
     }
 
     Map<String, String> data = {
@@ -400,14 +425,14 @@ class _EditLessonPageState extends State<EditLessonPage> {
     try {
       var response = await CallApi().puttJsonAndFileCourseLesson(
           data,
-          courseFiles['video'],
+          VidetUrl,
           AttachmentUrl,
           "/api/Course/UpdateCourseLesson",
           1);
       if (response != null && response.statusCode == 200) {
         ShowMyDialog.showMsg("تم تعديل الدرس بنجاح");
       } else {
-        ShowMyDialog.showMsg(response.reasonPhrase);
+        ShowMyDialog.showMsg(response.toString());
       }
       setState(() {
         _lesson_Loading = false;

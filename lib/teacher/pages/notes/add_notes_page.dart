@@ -54,6 +54,10 @@ class _AddNotePageState extends State<AddNotePage> {
   List<CustomModel?> selectedEducationTypeList = [null];
   List<List<CustomModel>?> curriculumTypeList = [null];
   List<CustomModel?> selectedCurriculumTypeList = [null];
+  List<List<CustomModel>?> gradesList = [null];
+  List<CustomModel?> selectedGradesList = [null];
+  List<List<CustomModel>?> subjectList = [null];
+  List<CustomModel?> selectedSubjectList = [null];
 
 
 
@@ -77,15 +81,14 @@ class _AddNotePageState extends State<AddNotePage> {
   bool _country_loading=false;
   bool _currency_loading=false;
   bool _educationProgramsLoading=false;
+  bool _subLoading=false;
 
 
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
-    _getSubOfTeacher();
     _get_educationType();
-    _get_educationLevels();
     _getCountry();
 
   }
@@ -101,11 +104,7 @@ class _AddNotePageState extends State<AddNotePage> {
         ListView(
           shrinkWrap: true,
           children: [
-            Text('اسم المادة', style: Theme.of(context).textTheme.titleMedium, textAlign: TextAlign.right,),
-            _teacherLoading?const Center(child: CircularProgressIndicator()):
-            CustomDropDown(_sub, changeSubject, subject, 'المادة'),
 
-            const SizedBox(height: 5,),
             Text('عنوان المذكرة', style: Theme.of(context).textTheme.titleMedium, textAlign: TextAlign.right,),
             CustomTextField(controller: _notTitleController, hintText: 'عنوان المذكرة', input: TextInputType.text),
 
@@ -115,15 +114,6 @@ class _AddNotePageState extends State<AddNotePage> {
 
 
             const SizedBox(height: 8,),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: [
-                Text('نوع التعليم', style: Theme.of(context).textTheme.titleMedium, textAlign: TextAlign.right,),
-                Text('نوع المنهج', style: Theme.of(context).textTheme.titleMedium, textAlign: TextAlign.right,),
-
-              ],
-            ),
-
             ListView.separated(
                 physics: const NeverScrollableScrollPhysics(),
                 shrinkWrap: true,
@@ -132,27 +122,47 @@ class _AddNotePageState extends State<AddNotePage> {
                 itemBuilder: (context, index) {
                   return Row(
                     children: [
-
                       Expanded(
                         child: Column(
                           children: [
-                            _type_loading?const Center(child: CircularProgressIndicator()):
-                            CustomDropDown(_educationTypes, (val){
-                              changeEducationType(val, index);
-                            }, selectedEducationTypeList[index], 'نوع التعليم'),
+                            Row(
+                              children: [
+                                Expanded(
+                                  child: CustomDropDown(_educationTypes, (val){
+                                    changeEducationType(val, index);
+                                  }, selectedEducationTypeList[index], 'نوع التعليم'),
+                                ),
 
-                          ],
-                        ),
-                      ),
+                                const SizedBox(width: 5,),
+                                if(curriculumTypeList[index] != null && curriculumTypeList[index]!.isNotEmpty)
+                                  Expanded(
+                                    child: CustomDropDown(curriculumTypeList[index]!,
+                                            (val){
+                                          change_educationPrograms(val, index);
+                                        }, selectedCurriculumTypeList[index], 'نوع المنهج'),
+                                  ),
+                              ],
+                            ),
+                            const SizedBox(height: 5,),
+                            Row(
+                              children: [
+                                if(gradesList[index] != null && gradesList[index]!.isNotEmpty)
+                                  Expanded(
+                                    child: CustomDropDown(gradesList[index]!, (val){
+                                      changeEducationLevel(val, index);
+                                    }, selectedGradesList[index], 'السنة الدراسية'),
+                                  ),
 
-                      const SizedBox(width: 5,),
-                      Expanded(
-                        child: Column(
-                          children: [
-                            CustomDropDown(curriculumTypeList[index]??[],
-                                    (val){
-                                  change_educationPrograms(val, index);
-                                }, selectedCurriculumTypeList[index], 'نوع المنهج'),
+                                const SizedBox(width: 5,),
+                                if(subjectList[index] != null && subjectList[index]!.isNotEmpty)
+                                  Expanded(
+                                    child: CustomDropDown(subjectList[index]!,
+                                            (val){
+                                          changeSubject(val, index);
+                                        }, selectedSubjectList[index], 'المادة'),
+                                  ),
+                              ],
+                            )
                           ],
                         ),
                       ),
@@ -165,6 +175,10 @@ class _AddNotePageState extends State<AddNotePage> {
                               curriculumTypeList.add(null);
                               selectedEducationTypeList.add(null);
                               selectedCurriculumTypeList.add(null);
+                              gradesList.add(null);
+                              selectedGradesList.add(null);
+                              subjectList.add(null);
+                              selectedSubjectList.add(null);
                               setState(() {});
                             },
                             child: const Icon(Icons.add_circle_sharp,
@@ -173,11 +187,6 @@ class _AddNotePageState extends State<AddNotePage> {
                   );
                 }
             ),
-
-            const SizedBox(height: 5,),
-            _level_loading ?Center(child: CircularProgressIndicator()):
-            Text('المرحلة الدراسية', style: Theme.of(context).textTheme.titleMedium, textAlign: TextAlign.right,),
-            CustomDropDown(_educationLevels, selectLevel,educationLevel, 'المرحلة الدراسية'),
 
             const SizedBox(height: 5,),
             _country_loading?Center(child: CircularProgressIndicator()):
@@ -275,20 +284,14 @@ class _AddNotePageState extends State<AddNotePage> {
     );
   }
 
-  changeSubject(val){
-    subject = val;
+  changeSubject(val, int index){
+    // curriculumType=val;
+    selectedSubjectList[index] = val;
     setState(() {
 
     });
   }
 
-
-  selectLevel(val){
-    educationLevel=val;
-    setState(() {
-
-    });
-  }
   selectPeriod(val){
     period=val;
     setState(() {
@@ -305,20 +308,36 @@ class _AddNotePageState extends State<AddNotePage> {
 
   }
 
+  changeEducationLevel(val, int index) async{
+
+    selectedGradesList[index] = val;
+    await _getSubOfTeacher(selectedEducationTypeList[index]!.Id, selectedGradesList[index]!.Id, selectedCurriculumTypeList[index]?.Id);
+    subjectList[index] = _sub;
+    setState(() {
+    });
+
+  }
+
   changeEducationType(val, int index) async{
     educationType=val;
     selectedEducationTypeList[index] = val;
-    await _getEducationPrograms();
+    await _getEducationPrograms(selectedEducationTypeList[index]!.Id);
     curriculumTypeList[index] = _educationPrograms;
-    curriculumType=null;
+
+    if(curriculumTypeList[index]!.isEmpty){
+      await _get_educationLevels(educationType!.Id, null);
+      gradesList[index] = _educationLevels;
+    }
     setState(() {
 
     });
   }
 
-  change_educationPrograms(val, int index){
-    curriculumType=val;
+  change_educationPrograms(val, int index)async{
     selectedCurriculumTypeList[index] = val;
+
+    await _get_educationLevels(selectedEducationTypeList[index]!.Id, selectedCurriculumTypeList[index]!.Id);
+    gradesList[index] = _educationLevels;
     setState(() {
 
     });
@@ -335,39 +354,6 @@ class _AddNotePageState extends State<AddNotePage> {
       return File(picked.path);
     }
   }
-
-  void _getSubOfTeacher()  async{
-    setState(() {
-      _teacherLoading=true;
-    });
-    Map<String,dynamic> data={
-      'teacherId':null
-    };
-    try {
-      var response = await CallApi().getWithBody(data, "/api/Teacher/GetTeacherSubjects", 1);
-      print(json.decode(response.body));
-      if (response != null && response.statusCode == 200) {
-        List body = json.decode(response.body);
-        _sub= body.map((e) => CustomModel.fromJson(e)).toList();
-        setState(() {
-          _teacherLoading=false;
-        });
-      }
-      else {
-        ShowMyDialog.showMsg(json.decode(response.body)['Message']);
-      }
-      setState(() {
-        _teacherLoading=false;
-      });
-    }
-    catch(e){
-      setState(() {
-        _teacherLoading=false;
-      });
-      print(' teacher  ee '+e.toString());
-    }
-  }
-
   void _get_educationType() async{
 
     setState(() {
@@ -391,18 +377,18 @@ class _AddNotePageState extends State<AddNotePage> {
     });
   }
 
-  Future _getEducationPrograms() async{
+  Future _getEducationPrograms(int educationTypeId) async{
 
     setState(() {
       _educationProgramsLoading=true;
     });
     Map <String, dynamic>data={
-      "educationTypeId" :educationType!.Id.toString()
+      "educationTypeId" :educationTypeId.toString()
     };
 
     try {
       var response = await CallApi().getWithBody(data,
-          "/api/EducationProgram/GetEducationPrograms",1);
+          "/api/EducationProgram/GetEducationPrograms",0);
       List body =json.decode(response.body) ;
       if (response != null && response.statusCode == 200) {
         _educationPrograms=body.map((e) => CustomModel.fromJson(e)).toList();
@@ -422,16 +408,20 @@ class _AddNotePageState extends State<AddNotePage> {
     }
 
   }
-
-  void _get_educationLevels() async{
+  Future _get_educationLevels(int educationTypeId, int? programTypeId) async{
 
     setState(() {
       _level_loading=true;
     });
 
+    Map <String, dynamic>data={
+      "educationTypeId" :educationTypeId.toString(),
+      "programTypeId" : programTypeId.toString()
+    };
 
     try {
-      var response = await CallApi().getData("/api/Teacher/GetTeacherGrades",1);
+      var response = await CallApi().getWithBody(data,
+          "/api/Grade/GetGradesByEducationProgramType",0);
 
       if (response != null && response.statusCode == 200) {
         List body =json.decode(response.body) ;
@@ -447,6 +437,40 @@ class _AddNotePageState extends State<AddNotePage> {
     setState(() {
       _level_loading=false;
     });
+  }
+  Future _getSubOfTeacher(int educationTypeId, int gradeId, int? programTypeId)  async{
+    setState(() {
+      _subLoading=true;
+    });
+    Map <String, dynamic>data={
+      "educationTypeId" : educationTypeId.toString(),
+      "gradeId" : gradeId.toString(),
+      "programTypeId" : programTypeId.toString()
+    };
+    try {
+      var response = await CallApi().getWithBody(data,
+          "/api/Subject/GetSubjects",0);
+      print(json.decode(response.body));
+      if (response != null && response.statusCode == 200) {
+        List body = json.decode(response.body);
+        _sub= body.map((e) => CustomModel.fromJson(e)).toList();
+        setState(() {
+          _subLoading=false;
+        });
+      }
+      else {
+        ShowMyDialog.showMsg(json.decode(response.body)['Message']);
+      }
+      setState(() {
+        _subLoading=false;
+      });
+    }
+    catch(e){
+      setState(() {
+        _subLoading=false;
+      });
+      print(' sub  ee '+e.toString());
+    }
   }
 
   void _getCountry() async{
@@ -563,19 +587,26 @@ class _AddNotePageState extends State<AddNotePage> {
     for(int i = 0; i < selectedEducationTypeList.length; i++){
       if(selectedEducationTypeList[i] != null){
         types['EducationTypeIds[$i]'] = selectedEducationTypeList[i]!.Id.toString();
+
       }
       if(selectedCurriculumTypeList[i] != null){
         types['ProgramTypeIds[$i]'] = selectedCurriculumTypeList[i]!.Id.toString();
+      }
+      if(selectedGradesList[i] != null){
+        types['GradeIDs[$i]'] = selectedGradesList[i]!.Id.toString();
+      }
+      if(selectedSubjectList[i] != null){
+        types['SubjectIDs[$i]'] = selectedSubjectList[i]!.Id.toString();
       }
     }
 
     Map<String, String> data={
       "Id": "0",
-      "SubjectId": subject!.Id.toString(),
+      // "SubjectId": subject!.Id.toString(),
       "Title": _notTitleController.text,
       "Description": _noteDescriptionController.text,
       // "Price": 70.0,
-      "GradeId": educationLevel!.Id.toString(),
+      // "GradeId": educationLevel!.Id.toString(),
       // "EducationTypeId": educationType!.Id.toString(),
       // "ProgramTypeId": curriculumType!.Id.toString(),
       // "NotebookImages": _images,

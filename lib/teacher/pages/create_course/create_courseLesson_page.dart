@@ -53,6 +53,7 @@ class _CreateCourseLessonPageState extends State<CreateCourseLessonPage> {
 
 
   List attachments = [null];
+  List videos = [null];
 
   final _courseNameController = TextEditingController();
   final _videoNameController = TextEditingController();
@@ -134,32 +135,75 @@ class _CreateCourseLessonPageState extends State<CreateCourseLessonPage> {
                 ),
 
                 const SizedBox(height: 8,),
+
                 Text('فيديوهات', style: Theme.of(context).textTheme.titleMedium, textAlign: TextAlign.right,),
-                          InkWell(
-                            onTap: () async{
-                              final picked = await ImagePicker().pickVideo(source: ImageSource.gallery);
-                              if(picked == null) return;
-
-                              final controller = VideoPlayerController.file(File(picked.path));
-                              controller.initialize().then((_) {
-                                // Get the duration of the video.
-                                videoDuration = controller.value.duration.inMinutes.toString().padLeft(2, '0') + ":" + controller.value.duration.inSeconds.toString().padLeft(2, '0');
-                              });
-
-
-                              courseFiles['video'] = picked;
-                              setState(() {});
-                            },
-                            child: CustomDottedBorder(
-                              child: Column(
-                                children: [
-                                  Image.asset('assets/images/promo.png'),
-                                  Text(courseFiles['video'] != null ? basename(courseFiles['video'].path)
-                                      : 'رفع فيديو', style: const TextStyle(fontSize: 14),),
-                                ],
+                ListView.builder(
+                  physics: const NeverScrollableScrollPhysics(),
+                  shrinkWrap: true,
+                  itemCount: videos.length,
+                  itemBuilder: (context, index)=>
+                      Row(
+                        children: [
+                          Container(
+                            margin: const EdgeInsets.only(bottom: 8),
+                            width: 130,
+                            child: InkWell(
+                              onTap: () async{
+                                final picked = await ImagePicker().pickVideo(source: ImageSource.gallery);
+                                if(picked == null) return;
+                                videos[index] = picked;
+                                setState(() {});
+                              },
+                              child: CustomDottedBorder(
+                                child: Column(
+                                  children: [
+                                    Image.asset('assets/images/promo.png'),
+                                    Text(videos[index] != null ? basename(videos[index].path)
+                                        : 'رفع فيديو', style: const TextStyle(fontSize: 14),),
+                                  ],
+                                ),
                               ),
                             ),
                           ),
+                          const SizedBox(width: 15,),
+                          if(index == videos.length - 1)
+                            InkWell(
+                                onTap: (){
+                                  videos.add(null);
+                                  setState(() {});
+                                },
+
+                                child: const Icon(Icons.add_circle_sharp, color: AppColors.primaryColor, size: 60,))
+                        ],
+                      )
+                  ,
+                ),
+
+                          // InkWell(
+                          //   onTap: () async{
+                          //     final picked = await ImagePicker().pickVideo(source: ImageSource.gallery);
+                          //     if(picked == null) return;
+                          //
+                          //     final controller = VideoPlayerController.file(File(picked.path));
+                          //     controller.initialize().then((_) {
+                          //       // Get the duration of the video.
+                          //       videoDuration = controller.value.duration.inMinutes.toString().padLeft(2, '0') + ":" + controller.value.duration.inSeconds.toString().padLeft(2, '0');
+                          //     });
+                          //
+                          //
+                          //     courseFiles['video'] = picked;
+                          //     setState(() {});
+                          //   },
+                          //   child: CustomDottedBorder(
+                          //     child: Column(
+                          //       children: [
+                          //         Image.asset('assets/images/promo.png'),
+                          //         Text(courseFiles['video'] != null ? basename(courseFiles['video'].path)
+                          //             : 'رفع فيديو', style: const TextStyle(fontSize: 14),),
+                          //       ],
+                          //     ),
+                          //   ),
+                          // ),
                 const SizedBox(height: 8,),
                 Text('مرفقات', style: Theme.of(context).textTheme.titleMedium, textAlign: TextAlign.right,),
                 ListView.builder(
@@ -254,7 +298,13 @@ class _CreateCourseLessonPageState extends State<CreateCourseLessonPage> {
 
     List<String>  AttachmentUrl  =[];
     for(int i=0;i<attachments.length;i++){
+      if(attachments[i] == null) continue;
       AttachmentUrl.add( attachments[i].path);
+    }
+    List<String>  VidetUrl  =[];
+    for(int i=0;i<videos.length;i++){
+      if(videos[i] == null) continue;
+      VidetUrl.add( videos[i].path);
     }
 
     Map<String, String> data={
@@ -266,10 +316,10 @@ class _CreateCourseLessonPageState extends State<CreateCourseLessonPage> {
      "Duration":videoDuration??'',
       "Free": _isFree.toString(),
     };
-    //  print(' lesson data   '+data.toString());
+     print(' lesson data   '+data.toString());
 
     try {
-      var response =await CallApi().postJsonAndFileCourseLesson(data,courseFiles['video'],
+      var response =await CallApi().postJsonAndFileCourseLesson(data,VidetUrl,
           AttachmentUrl, "/api/Course/AddCourseLesson", 1);
       if (response != null && response.statusCode == 200) {
         ShowMyDialog.showMsg("تم إضافة الدرس بنجاح");

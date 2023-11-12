@@ -333,14 +333,14 @@ class _TeacherGroupsContentPageState extends State<TeacherGroupsContentPage> {
           Column(
             children: [
               Text(title, style: Theme.of(context).textTheme.titleMedium,),
-              Text(subtitle, style: Theme.of(context).textTheme.titleSmall,),
+              SizedBox(width: 100, child: Text(subtitle, style: Theme.of(context).textTheme.titleSmall,)),
             ],
           ),
           const Spacer(),
           Column(
             children: [
               Text(date,),
-              Text(time,),
+              SizedBox(width: 100, child: Text(time,)),
             ],
           ),
           const Icon(Icons.play_circle, color: AppColors.primaryColor, size: 50,)
@@ -485,15 +485,15 @@ class _TeacherGroupsContentPageState extends State<TeacherGroupsContentPage> {
       var response = await CallApi().getWithBody(data,"/api/Group/GetGroupById",1);
 
       var body = json.decode(response.body);
-     // print('bodyyyyy   '+body.toString());
+     print('bodyyyyy   '+body.toString());
       if (response != null && response.statusCode == 200) {
         subject = new CustomModel(
             Id: body['SubjectId'], Name: body['SubjectName'], NameEN: '');
-        curriculumType = new CustomModel(Id: body['ProgramTypeId'],
+        curriculumType = body['ProgramTypeId'] == null ? null : new CustomModel(Id: body['ProgramTypeId'],
             Name: body['ProgramTypeName'],
             NameEN: '');
 
-        educationType = new CustomModel(Id: body['EducationTypeId'],
+        educationType =  body['EducationTypeId'] == null ? null :  new CustomModel(Id: body['EducationTypeId'],
             Name: body['EducationTypeName'], NameEN: '');
 
 

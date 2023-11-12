@@ -128,6 +128,7 @@ class _HomePageState extends State<HomePage> {
                                 context,
                                 MyWalletPage(
                                   walletValue: _walletValue!,
+                                  model: model,
                                 )),
                             icon: const Icon(
                               Icons.wallet_giftcard_outlined,

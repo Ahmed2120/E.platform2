@@ -9,7 +9,10 @@ import '../../core/utility/app_colors.dart';
 import '../../model/customModel.dart';
 import '../../session/userSession.dart';
 import '../../widgets/dialogs/alertMsg.dart';
+import '../../widgets/drop_downs/custom_dropdown.dart';
 import '../login_page/login_page.dart';
+import 'components/drop_down.dart';
+import 'components/multi_select_Dwon.dart';
 import 'components/otp_dialog.dart';
 import 'components/register_field.dart';
 import 'components/register_pages_lists.dart';
@@ -67,7 +70,7 @@ class _TeacherRegisterPageState extends State<TeacherRegisterPage> {
   List<CustomModel> _educatationType=[];
   List <String> educationTypeList=[];
   int  ? _e_type_index ;
-  String ? educationType;
+  CustomModel? educationType;
 
   List<CustomModel> _education_level=[];
   List <String>educationLevelList=[];
@@ -89,6 +92,14 @@ class _TeacherRegisterPageState extends State<TeacherRegisterPage> {
   int  ? _e_program_index ;
   List<String>   selectEdducationPrograms = [];
 
+  List<CustomModel?> selectedEducationTypeList = [null];
+  List<List<CustomModel>?> curriculumTypeList = [null];
+  List<CustomModel?> selectedCurriculumTypeList = [null];
+  List<List<CustomModel>?> gradesList = [null];
+  List<CustomModel?> selectedGradesList = [null];
+  List<List<CustomModel>?> subjectList = [null];
+  List<CustomModel?> selectedSubjectList = [null];
+
   File? cv;
   File? certificate;
   File? promo;
@@ -103,7 +114,7 @@ class _TeacherRegisterPageState extends State<TeacherRegisterPage> {
     super.initState();
     _getCountry();
     _get_educationType();
-    _get_grades();
+    // _get_grades();
   }
 
   @override
@@ -129,11 +140,12 @@ class _TeacherRegisterPageState extends State<TeacherRegisterPage> {
                   _phoneController, _idController, _emailController, _passwordController,
                   _confirmPasswordController, gender, changeGender: changeGender, isPassword: isPassword, isConfirmPassword: isConfirmPassword, togglePass: togglePass, toggleConfirmPass: toggleConfirmPass),
               if(currentPage == 2 )...secondPage(countries: countries, changeCountry: changeCountries, country: country, cities: cities, changeCity: changeCities, city: city, areas: areas, changeArea: changeAreas, area: area),
-              if(currentPage == 3 )...teacherThirdPage(
-                  educationTypeList: educationTypeList, changeEducationType: changeEducationType,
-                  educationType: educationType, educationLevelList: educationLevelList, changeEducationLevel: changeEducationLevel,
-                  selectedEducationLevels: selectedEducationLevel, subjects: subjects, changeSubject: changeSubject, selectedSubjects: selectedSubjects,
-                  educationPrograms: educationPrograms, changeEducationPrograms: changeEducationPrograms, selectEdducationPrograms: selectEdducationPrograms, hasProgram: hasProgram),
+              // if(currentPage == 3 )...teacherThirdPage(
+              //     educationTypeList: educationTypeList, changeEducationType: changeEducationType,
+              //     educationType: educationType, educationLevelList: educationLevelList, changeEducationLevel: changeEducationLevel,
+              //     selectedEducationLevels: selectedEducationLevel, subjects: subjects, changeSubject: changeSubject, selectedSubjects: selectedSubjects,
+              //     educationPrograms: educationPrograms, changeEducationPrograms: changeEducationPrograms, selectEdducationPrograms: selectEdducationPrograms, hasProgram: hasProgram),
+              if(currentPage == 3 ) _thirdPage(),
               if(currentPage == 4 )...teacherFourthPage(getCV: getCv,
                 getCertificate: getCertificate, getPromo: getPromo, cv: cv, certificate: certificate, promo: promo),
               const SizedBox(height: 20,),
@@ -167,6 +179,107 @@ class _TeacherRegisterPageState extends State<TeacherRegisterPage> {
     );
   }
 
+  Widget _thirdPage(){
+    return Column(
+      children: [
+
+        ListView.separated(
+            physics: const NeverScrollableScrollPhysics(),
+            shrinkWrap: true,
+            itemCount: curriculumTypeList.length,
+            separatorBuilder: (context, index)=> const SizedBox(height: 10,),
+            itemBuilder: (context, index) {
+              return Row(
+                children: [
+
+                  Expanded(
+                    child: Column(
+                      children: [
+                        Row(
+                          children: [
+                            Expanded(
+                              child: Column(
+                                children: [
+                                  CustomDropDown(_educatationType, (val){
+                                    changeEducationType(val, index);
+                                  }, selectedEducationTypeList[index], 'نوع التعليم'),
+
+                                ],
+                              ),
+                            ),
+
+                            const SizedBox(width: 5,),
+                            if(curriculumTypeList[index] != null && curriculumTypeList[index]!.isNotEmpty)
+                              Expanded(
+                                child: Column(
+                                  children: [
+                                    CustomDropDown(curriculumTypeList[index]!,
+                                            (val){
+                                          change_educationPrograms(val, index);
+                                        }, selectedCurriculumTypeList[index], 'نوع المنهج'),
+                                  ],
+                                ),
+                              ),
+                          ],
+                        ),
+                        const SizedBox(height: 5,),
+                        Row(
+                          children: [
+                            if(gradesList[index] != null && gradesList[index]!.isNotEmpty)
+                            Expanded(
+                              child: Column(
+                                children: [
+                                  CustomDropDown(gradesList[index]!, (val){
+                                    changeEducationLevel(val, index);
+                                  }, selectedGradesList[index], 'السنة الدراسية'),
+
+                                ],
+                              ),
+                            ),
+
+                            const SizedBox(width: 5,),
+                            if(subjectList[index] != null && subjectList[index]!.isNotEmpty)
+                              Expanded(
+                                child: Column(
+                                  children: [
+                                    CustomDropDown(subjectList[index]!,
+                                            (val){
+                                          changeSubject(val, index);
+                                        }, selectedSubjectList[index], 'المادة'),
+                                  ],
+                                ),
+                              ),
+                          ],
+                        )
+                      ],
+                    ),
+                  ),
+
+
+                  const SizedBox(width: 10,),
+                  if(index == curriculumTypeList.length - 1)
+                    InkWell(
+                        onTap: ()
+                        {
+                          curriculumTypeList.add(null);
+                          selectedEducationTypeList.add(null);
+                          selectedCurriculumTypeList.add(null);
+                          gradesList.add(null);
+                          selectedGradesList.add(null);
+                          subjectList.add(null);
+                          selectedSubjectList.add(null);
+                          setState(() {});
+                        },
+                        child: const Icon(Icons.add_circle_sharp,
+                          color: AppColors.primaryColor, size: 40,))
+                ],
+              );
+            }
+        ),
+      ],
+    );
+  }
+
   changePage(){
     if(currentPage == 4) return;
     if(currentPage == 1) {
@@ -177,12 +290,13 @@ class _TeacherRegisterPageState extends State<TeacherRegisterPage> {
         ShowMyDialog.showMsg('الرجاء ملئ جميع الحقول');
         return;
       }
-    }else if(currentPage == 3) {
-      if(educationType == null || selectedEducationLevel.isEmpty || subjects.isEmpty){
-        ShowMyDialog.showMsg('الرجاء ملئ جميع الحقول');
-        return;
-      }
     }
+    // else if(currentPage == 3) {
+    //   if(educationType == null || selectedEducationLevel.isEmpty || subjects.isEmpty){
+    //     ShowMyDialog.showMsg('الرجاء ملئ جميع الحقول');
+    //     return;
+    //   }
+    // }
     currentPage ++;
     setState(() {});
 
@@ -219,19 +333,27 @@ class _TeacherRegisterPageState extends State<TeacherRegisterPage> {
     setState(() {});
   }
 
-  changeEducationType(value){
-    educationType=value;
-    setState(() {
-      _e_type_index = _educatationType.indexWhere((item) => item.Name== value);
-      _getEducationPrograms();
-    });
+  changeEducationType(val, int index) async{
+    educationType=val;
+    selectedEducationTypeList[index] = val;
+    await _getEducationPrograms(educationType!.Id);
+    curriculumTypeList[index] = _education_programs;
 
+    if(curriculumTypeList[index]!.isEmpty){
+      await _get_grades(educationType!.Id, null);
+      gradesList[index] = _education_level;
+    }
+    // curriculumType=null;
+    setState(() {
+
+    });
   }
 
-  changeEducationLevel(value){
-    selectedEducationLevel=value;
-    // _e_level_index = _education_level.indexWhere((item) => item.Name== value);
-    _get_subjects();
+  changeEducationLevel(val, int index) async{
+
+    selectedGradesList[index] = val;
+    await _get_subjects(selectedEducationTypeList[index]!.Id, selectedGradesList[index]!.Id, selectedCurriculumTypeList[index]?.Id);
+    subjectList[index] = _subjects;
     setState(() {
     });
 
@@ -244,21 +366,30 @@ class _TeacherRegisterPageState extends State<TeacherRegisterPage> {
     });
 
   }
-
-  changeSubject(value){
-    selectedSubjects=value;
-    // _e_subject_index = _subjects.indexWhere((item) => item.Name== value);
+  changeSubject(val, int index){
+    // curriculumType=val;
+    selectedSubjectList[index] = val;
     setState(() {
-    });
 
+    });
   }
 
-  changeEducationPrograms(value){
-    selectEdducationPrograms=value;
-    // _e_program_index = _education_programs.indexWhere((item) => item.Name== value);
-    setState(() {
-    });
+  // changeEducationPrograms(value){
+  //   selectEdducationPrograms=value;
+  //   // _e_program_index = _education_programs.indexWhere((item) => item.Name== value);
+  //   setState(() {
+  //   });
+  //
+  // }
+  change_educationPrograms(val, int index) async{
+    // curriculumType=val;
+    selectedCurriculumTypeList[index] = val;
 
+    await _get_grades(selectedEducationTypeList[index]!.Id, selectedCurriculumTypeList[index]!.Id);
+    gradesList[index] = _education_level;
+    setState(() {
+
+    });
   }
 
   togglePass(){
@@ -448,18 +579,19 @@ class _TeacherRegisterPageState extends State<TeacherRegisterPage> {
     });
   }
 
-  void _get_grades() async{
+  Future _get_grades(int educationTypeId, int? programTypeId) async{
 
     setState(() {
       _country_loading=true;
     });
     Map <String, dynamic>data={
-      // "educationTypeId" :_educatationType[_e_type_index!].Id.toString()
+      "educationTypeId" :educationTypeId.toString(),
+      "programTypeId" : programTypeId.toString()
     };
 
     try {
       var response = await CallApi().getWithBody(data,
-          "/api/Grade/GetGrades",0);
+          "/api/Grade/GetGradesByEducationProgramType",0);
       List body =json.decode(response.body) ;
       if (response != null && response.statusCode == 200) {
         _education_level=body.map((e) => CustomModel.fromJson(e)).toList();
@@ -477,14 +609,15 @@ class _TeacherRegisterPageState extends State<TeacherRegisterPage> {
     });
   }
 
-  void _get_subjects() async{
+  Future _get_subjects(int educationTypeId, int gradeId, int? programTypeId) async{
 
     setState(() {
       _country_loading=true;
     });
     Map <String, dynamic>data={
-      "educationTypeId" :_educatationType[_e_type_index!].Id.toString(),
-      "gradeId" :_education_level[_e_type_index!].Id.toString()
+      "educationTypeId" : educationTypeId.toString(),
+      "gradeId" : gradeId.toString(),
+      "programTypeId" : programTypeId.toString()
     };
 
     try {
@@ -507,13 +640,13 @@ class _TeacherRegisterPageState extends State<TeacherRegisterPage> {
     });
   }
 
-  void _getEducationPrograms() async{
+  Future _getEducationPrograms(int educationTypeId) async{
 
     setState(() {
       _country_loading=true;
     });
     Map <String, dynamic>data={
-      "educationTypeId" :_educatationType[_e_type_index!].Id.toString()
+      "educationTypeId" :educationTypeId.toString()
     };
 
     try {
@@ -550,25 +683,41 @@ class _TeacherRegisterPageState extends State<TeacherRegisterPage> {
       _reg_loading=true;
     });
 
-     List<int>e=[];
-     e.add(_educatationType[_e_type_index!].Id);
+    //  List<int>e=[];
+    //  e.add(_educatationType[_e_type_index!].Id);
+    //
+    // List<int>g=[];
+    // for(int i = 0; i < selectedEducationLevel.length; i++) {
+    //   final index = _education_level.indexWhere((item) => item.Name== selectedEducationLevel[i]);
+    //   g.add(_education_level[index].Id);
+    // }
 
-    List<int>g=[];
-    for(int i = 0; i < selectedEducationLevel.length; i++) {
-      final index = _education_level.indexWhere((item) => item.Name== selectedEducationLevel[i]);
-      g.add(_education_level[index].Id);
-    }
+    // List<int>s=[];
+    // for(int i = 0; i < selectedSubjects.length; i++) {
+    //   final index = _subjects.indexWhere((item) => item.Name== selectedSubjects[i]);
+    //   s.add(_subjects[index].Id);
+    // }
 
-    List<int>s=[];
-    for(int i = 0; i < selectedSubjects.length; i++) {
-      final index = _subjects.indexWhere((item) => item.Name== selectedSubjects[i]);
-      s.add(_subjects[index].Id);
-    }
+    // List<int>p=[];
+    // for(int i = 0; i < selectEdducationPrograms.length; i++) {
+    //   final index = _education_programs.indexWhere((item) => item.Name== selectEdducationPrograms[i]);
+    //   p.add(_education_programs[index].Id);
+    // }
 
-    List<int>p=[];
-    for(int i = 0; i < selectEdducationPrograms.length; i++) {
-      final index = _education_programs.indexWhere((item) => item.Name== selectEdducationPrograms[i]);
-      p.add(_education_programs[index].Id);
+    Map<String, String> types = {};
+    for(int i = 0; i < selectedEducationTypeList.length; i++){
+      if(selectedEducationTypeList[i] != null){
+        types['EducationTypeIds[$i]'] = selectedEducationTypeList[i]!.Id.toString();
+      }
+      if(selectedCurriculumTypeList[i] != null){
+        types['ProgramTypeIds[$i]'] = selectedCurriculumTypeList[i]!.Id.toString();
+      }
+      if(selectedGradesList[i] != null){
+        types['GradeIDs[$i]'] = selectedGradesList[i]!.Id.toString();
+      }
+      if(selectedSubjectList[i] != null){
+        types['SubjectIDs[$i]'] = selectedSubjectList[i]!.Id.toString();
+      }
     }
 
     Map<String, String> data={
@@ -579,6 +728,7 @@ class _TeacherRegisterPageState extends State<TeacherRegisterPage> {
       'Password': _passwordController.text.toString(),
       'Gender':gender.toString(),
       'StateId':_areas[_area_index!].Id.toString(),
+      ...types,
       'UserType': 2.toString(),
       'StudyingDegreeCertificate': 'teacher',
       'StudyingDegree': 'teacher',
@@ -586,18 +736,18 @@ class _TeacherRegisterPageState extends State<TeacherRegisterPage> {
       'DeviceToken': 'teacher'
     };
 
-    for(int i = 0; i< e.length; i++){
-      data.addAll({"EducationTypeIDs[$i]": e[i].toString()});
-    }
-    for(int i = 0; i< g.length; i++){
-      data.addAll({"GradeIDs[$i]": g[i].toString()});
-    }
-    for(int i = 0; i< s.length; i++){
-      data.addAll({"SubjectIDs[$i]": s[i].toString()});
-    }
-    for(int i = 0; i< p.length; i++){
-      data.addAll({"ProgramTypeIDs[$i]": p[i].toString()});
-    }
+    // for(int i = 0; i< e.length; i++){
+    //   data.addAll({"EducationTypeIDs[$i]": e[i].toString()});
+    // }
+    // for(int i = 0; i< g.length; i++){
+    //   data.addAll({"GradeIDs[$i]": g[i].toString()});
+    // }
+    // for(int i = 0; i< s.length; i++){
+    //   data.addAll({"SubjectIDs[$i]": s[i].toString()});
+    // }
+    // for(int i = 0; i< p.length; i++){
+    //   data.addAll({"ProgramTypeIDs[$i]": p[i].toString()});
+    // }
 
     List<File?> files = [
       cv, certificate, promo

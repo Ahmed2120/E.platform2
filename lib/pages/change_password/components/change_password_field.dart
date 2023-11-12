@@ -6,7 +6,8 @@ class ChangePasswordField extends StatelessWidget {
         required TextEditingController controller,
         this.passwordController,
         required this.hintText,
-        this.hidePassword = true,
+        required this.hidePassword,
+        required this.togglePass,
         this.isConfirmPassword = false})
       : _controller = controller;
 
@@ -15,6 +16,7 @@ class ChangePasswordField extends StatelessWidget {
   String hintText;
   bool isConfirmPassword;
   bool hidePassword;
+  Function togglePass;
 
   @override
   Widget build(BuildContext context) {
@@ -29,7 +31,7 @@ class ChangePasswordField extends StatelessWidget {
             filled: true,
             fillColor: Colors.white,
             hintText: hintText,
-            prefixIcon: hidePassword ? const Icon(Icons.visibility) : const Icon(Icons.visibility_off),
+            suffixIcon: IconButton(onPressed: ()=>togglePass(), icon: hidePassword ? const Icon(Icons.visibility_off) : const Icon(Icons.visibility)),
 
             focusedBorder: OutlineInputBorder(
                 borderSide: const BorderSide(

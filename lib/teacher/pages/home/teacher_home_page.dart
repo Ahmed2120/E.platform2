@@ -93,7 +93,7 @@ class _TeacherHomePageState extends State<TeacherHomePage> {
                                     onPressed: ()=> GlobalMethods.navigate(context, NotificationPage()), icon: const Icon(Icons.notifications,
                                   color: Colors.white,)),
                                 IconButton(onPressed: ()=>GlobalMethods.navigate(context,
-                                    TeacherWalletPage(walletValue: _walletValue!,)), icon: const Icon(Icons.wallet_giftcard_outlined, color: Colors.white,)),
+                                    TeacherWalletPage(walletValue: _walletValue!, model: model,)), icon: const Icon(Icons.wallet_giftcard_outlined, color: Colors.white,)),
                               ],
                             ),
                           ),

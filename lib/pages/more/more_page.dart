@@ -88,7 +88,7 @@ getUserData();
                       onTap: ()=> GlobalMethods.navigate(context, const TasksPage()),
                       child: buildContainer('المهام', 'assets/images/score.png', context, hasCoins: true)),
                   InkWell(
-                      onTap: ()=> GlobalMethods.navigate(context, MyWalletPage(walletValue: _walletValue!,)),
+                      onTap: ()=> GlobalMethods.navigate(context, MyWalletPage(walletValue: _walletValue!, model: model,)),
                       child: buildContainer('المحفظة', 'assets/images/wallet 1.png', context)),
                   InkWell(
                       onTap: ()=> GlobalMethods.navigate(context, CoursesAndGroupsPage(model: model)  ),

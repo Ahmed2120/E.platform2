@@ -598,7 +598,7 @@ class CallApi{
 
 
 
-  postJsonAndFileCourseLesson(Map<String, String>data, videoFile,List<String>AttachmentUrl,apiUrl ,x ) async {
+  postJsonAndFileCourseLesson(Map<String, String>data, List<String>videoFile,List<String>AttachmentUrl,apiUrl ,x ) async {
     try {
       msg='';
       var fullUrl = _url + apiUrl;
@@ -615,9 +615,13 @@ class CallApi{
 
         request.fields.addAll(data);
 
-            request.files.add(await http.MultipartFile.fromPath('Video',videoFile.path));
+      for (String filePath in videoFile){
 
-            for (String filePath in AttachmentUrl) {
+        request.files
+            .add(await http.MultipartFile.fromPath('Video', filePath));
+      }
+
+      for (String filePath in AttachmentUrl) {
               File file = File(filePath);
               var fileStream = http.ByteStream(file.openRead());
               var fileLength = await file.length();
@@ -667,7 +671,7 @@ class CallApi{
     }
   }
 
-  puttJsonAndFileCourseLesson(Map<String, String>data, videoFile,List<String>AttachmentUrl,apiUrl ,x ) async {
+  puttJsonAndFileCourseLesson(Map<String, String>data,  List<String>videoFile,List<String>AttachmentUrl,apiUrl ,x ) async {
     try {
       msg='';
       var fullUrl = _url + apiUrl;
@@ -684,7 +688,11 @@ class CallApi{
 
         request.fields.addAll(data);
 
-            request.files.add(await http.MultipartFile.fromPath('Video',videoFile.path));
+      for (String filePath in videoFile){
+
+        request.files
+            .add(await http.MultipartFile.fromPath('Video', filePath));
+      }
 
             for (String filePath in AttachmentUrl) {
               File file = File(filePath);
