@@ -31,7 +31,8 @@ mixin TeacherCreatedGroupModel on Model{
 
      try {
        var response = await CallApi().getWithBody(data,"/api/Group/ShowTeacherAllGroups", 1);
-      //  print ("groups "+response.body);
+       print ('lllllllllllllllllllllllllllllllll');
+       print ("groups "+response.body);
        if (response != null && response.statusCode == 200) {
          List body = json.decode(response.body);
          _list = body.map((e) => TeacherCreatedGroup.fromJson(e)).toList();

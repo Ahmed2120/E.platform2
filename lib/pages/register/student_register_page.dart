@@ -394,7 +394,7 @@ class _StudentRegisterPageState extends State<StudentRegisterPage> {
   }
 
   void _get_gradesByEducationTypeId() async{
-
+print('------------------------');
     setState(() {
       _country_loading=true;
     });
@@ -403,8 +403,11 @@ class _StudentRegisterPageState extends State<StudentRegisterPage> {
     };
 
     try {
+      // var response = await CallApi().getWithBody(data,
+      //     "/api/EducationTypeGrade/GetGradesByEducationTypeId",0);
       var response = await CallApi().getWithBody(data,
-          "/api/EducationTypeGrade/GetGradesByEducationTypeId",0);
+          "/api/Grade/GetGradesByEducationProgramType",0);
+
       List body =json.decode(response.body) ;
       if (response != null && response.statusCode == 200) {
         _education_level=body.map((e) => CustomModel.fromJson(e)).toList();

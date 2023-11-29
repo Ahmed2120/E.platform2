@@ -31,6 +31,7 @@ mixin StudentSubscriptionsModel  on Model{
 
     try {
       var response = await CallApi().getWithBody(data, "/api/Student/GetStudentSubscriptions", 1);
+        print('(((((((((((((((((())))))))))))))))))');
         print(json.decode(response.body));
         var body = json.decode(response.body);
       if (response != null && response.statusCode == 200) {

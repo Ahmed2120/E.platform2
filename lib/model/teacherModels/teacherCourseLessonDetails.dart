@@ -18,7 +18,7 @@ class TeacherCourseLessonDetails{
            LessonId: json['LessonId'],
            LessonTitle: json['LessonTitle'],
            SubjectId: json['SubjectId'],
-           SubjectName: json['SubjectName'],
+           SubjectName: json['SubjectName']??'',
            FirstLessonVideoUrl: json['FirstLessonVideoUrl']==null?'':
           UserSession.getURL()+json['FirstLessonVideoUrl'],
            LessonPrice:json['LessonPrice']==null?0.0:json['LessonPrice'],

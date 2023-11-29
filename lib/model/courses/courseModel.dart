@@ -189,6 +189,7 @@ mixin CourseModel on Model{
     try {
       var response = await CallApi().getWithBody(data, "/api/Course/GetCourseLessonDetails",1);
 
+     print('ooooooooooooooooooo----------oooooooooooooooo');
      print(json.decode(response.body));
       var body = json.decode(response.body);
       if (response != null && response.statusCode == 200) {

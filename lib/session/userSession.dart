@@ -4,7 +4,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 class UserSession{
 
   static String getURL(){
-    return 'http://educationteach-001-site1.etempurl.com';
+    return 'http://educationplat22-001-site1.etempurl.com';
   }
 
   static List<int> priviliges = [];

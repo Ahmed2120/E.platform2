@@ -8,7 +8,7 @@ import '../widgets/dialogs/alertMsg.dart';
 
 class CallApi{
 
-  final String _url='http://educationteach-001-site1.etempurl.com';
+  final String _url='http://educationplat22-001-site1.etempurl.com';
     String msg='' ;
 
   postData(data,apiUrl ,x  ) async {

@@ -39,7 +39,7 @@ class _SponsorsState extends State<Sponsors> {
               separatorBuilder: (context, index)=> const SizedBox(width: 10,),
               itemCount: model.allHomeAds.length,
               itemBuilder: (ctx, index) {
-                print('vvvvvvvvvv');
+
                 return sponsorsContainer(model.allHomeAds[index].Image!,
                         ()=>GlobalMethods.navigate(ctx, AdvertisingPage(
                   adsId: model.allHomeAds[index].Id!, model: model,)));

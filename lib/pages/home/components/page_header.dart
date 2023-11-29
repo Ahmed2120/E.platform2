@@ -1,5 +1,6 @@
 import 'package:eplatform/core/utility/app_colors.dart';
 import 'package:eplatform/core/utility/global_methods.dart';
+import 'package:eplatform/pages/exam/exam.dart';
 import 'package:eplatform/pages/live/live_page.dart';
 import 'package:flutter/material.dart';
 import 'package:percent_indicator/circular_percent_indicator.dart';
@@ -26,7 +27,7 @@ class PageHeader extends StatelessWidget {
       scrollDirection: Axis.horizontal,
       children: [
              buildColumn('اختبر نفسك', Image.asset('assets/images/exam.png', width: 30, height: 30,),()=>
-              GlobalMethods.navigate(context,TestYourselfPage(model: model,))),
+              GlobalMethods.navigate(context,ExamPage(model: model,))),
                  const SizedBox(width: 8,),
               buildColumn('درجاتي', Image.asset('assets/images/grades.png', width: 30, height: 30,),
                 ()=> GlobalMethods.navigate(context, MyGradesPage(model: model)  )),

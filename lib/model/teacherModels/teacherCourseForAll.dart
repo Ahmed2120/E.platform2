@@ -19,7 +19,7 @@ class TeacherCourseForAll{
         return  TeacherCourseForAll(
             CourseId: json['CourseId'],
             Title: json['Title'],
-            SubjectName: json['SubjectName'],
+            SubjectName: json['SubjectName'] ?? '',
             StudentsCount: json['StudentsCount'],
             SessionsCount: json['SessionsCount'],
             Price: json['Price']==null ?0.0 :json['Price'],

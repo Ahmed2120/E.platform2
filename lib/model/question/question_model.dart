@@ -21,18 +21,20 @@ mixin QuestionModel on Model{
   void fetchQuestions({
     required int subjectId,
     required int educationTypeId,
+    required int educationProgramId,
     required int educationLevelId,
   })  async{
     _quest_loading=true;
     notifyListeners();
 
     Map<String,dynamic> data={
-      'subjectId':subjectId.toString(),
-      'educationTypeId':subjectId.toString(),
-      'gradeId':subjectId.toString()
+      "EducationTypeIds":[educationTypeId],
+      "ProgramTypeIds":[educationProgramId],
+      "GradeIds":[educationLevelId],
+      "SubjectIds":[subjectId]
     };
     try {
-      var response = await CallApi().getWithBody(data, "/api/Question/GetQuestions", 1);
+      var response = await CallApi().postData(jsonEncode(data), "/api/Question/GetQuestions", 1);
       print(json.decode(response.body));
       if (response != null && response.statusCode == 200) {
         List body = json.decode(response.body);

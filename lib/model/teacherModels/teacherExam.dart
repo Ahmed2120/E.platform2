@@ -10,5 +10,5 @@ class TeacherExam{
            ExamId: json['ExamId'],
            Title: json['Title'],
            SubjectId: json['SubjectId']==null?0:json['SubjectId'],
-           SubjectName: json['SubjectName']);
+           SubjectName: json['SubjectName']??'');
 }

@@ -6,7 +6,7 @@ import 'package:http/http.dart' as http;
 import '../session/userSession.dart';
 import '../widgets/dialogs/alertMsg.dart';
 class TeacherCall{
-  final String _url='http://educationteach-001-site1.etempurl.com';
+  final String _url='http://educationplat22-001-site1.etempurl.com';
   String msg='' ;
   postData(data,apiUrl,int x) async {
 

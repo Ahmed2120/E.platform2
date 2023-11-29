@@ -25,7 +25,7 @@ mixin HomeWorkModel on Model{
     Map<String,dynamic> data={'subjectId':subjectId.toString()};
     try {
       var response = await CallApi().getWithBody(data, "/api/Homework/GetHomeworks",1);
-       //  print("body  "+json.decode(response.body).toString());
+        print("body  "+json.decode(response.body).toString());
       if (response != null && response.statusCode == 200) {
         var body = json.decode(response.body);
         List d=body['DeliveredHomeworks'];

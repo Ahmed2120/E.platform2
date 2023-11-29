@@ -46,10 +46,12 @@ class _AvailableAssistantPageState extends State<AvailableAssistantPage> {
               itemBuilder: (context, index)=>
                   InkWell(
                     // onTap: ()=> GlobalMethods.navigate(context, AddAssistantPage(assistantId: 1,)),
-                    onTap: ()=> model.addAssistantRequest(teacherId: model.assistantTeachers[index].Id),
+                    onTap: ()=> model.assistantTeachers[index].status == 0 ?
+                    model.addAssistantRequest(teacherId: model.assistantTeachers[index].Id) : (){},
                       child: assistantContainer(context,
                         name: model.assistantTeachers[index].Name,
                         img: model.assistantTeachers[index].ProfileImage,
+                        status: model.assistantTeachers[index].status
                         )),
 
             );
@@ -62,12 +64,13 @@ class _AvailableAssistantPageState extends State<AvailableAssistantPage> {
   Container assistantContainer(context, {
     required String name,
     required String img,
+    required int status
   }) {
     return Container(
       padding: const EdgeInsets.all(15),
       margin: const EdgeInsets.symmetric(vertical: 10, horizontal: 2),
       decoration: BoxDecoration(
-        border: const Border(right: BorderSide(color: AppColors.primaryColor, width: 5)),
+        border: Border(right: BorderSide(color: status ==0 ? AppColors.primaryColor : Colors.grey, width: 5)),
         color: Colors.white,
         boxShadow: [
           BoxShadow(
@@ -87,10 +90,11 @@ class _AvailableAssistantPageState extends State<AvailableAssistantPage> {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 8),
             decoration: BoxDecoration(
-                color: AppColors.primaryColor,
+                color: status ==0 ? AppColors.primaryColor : Colors.grey,
                 borderRadius: BorderRadius.circular(15)
             ),
-            child: const Text('اضافة', style: TextStyle(color: Colors.white),),
+            child: Text(status ==0 ? 'اضافة' : 'تم الارسال', style:
+            TextStyle(color: status ==0 ?  Colors.white : Colors.black),),
           ),
         ],
       ),

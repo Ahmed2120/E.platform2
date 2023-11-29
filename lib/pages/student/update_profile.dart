@@ -204,7 +204,7 @@ class _UpdateProfilePageState extends State<UpdateProfilePage> {
     _nameController.text = widget.name!;
     _emailController.text = widget.email!;
     _phoneController.text = widget.phone!;
-    _nationalController.text = widget.national!;
+    _nationalController.text = widget.national??'';
     _schoolController.text = widget.school ?? '';
 
     setState(() {});
@@ -231,7 +231,7 @@ class _UpdateProfilePageState extends State<UpdateProfilePage> {
 
     print('data   '+data.toString());
 
-    try {
+    // try {
       var response = await CallApi().postData(data, "/api/Student/UpdateStudentProfile", 1);
       var body = json.decode(response.body);
       print ('body '+body.toString());
@@ -250,13 +250,13 @@ class _UpdateProfilePageState extends State<UpdateProfilePage> {
       setState(() {
         _Loading=false;
       });
-    }
-    catch(e){
-      setState(() {
-        _Loading=false;
-      });
-      print(' add Note  ee '+e.toString());
-    }
+    // }
+    // catch(e){
+    //   setState(() {
+    //     _Loading=false;
+    //   });
+    //   print(' add Note  ee '+e.toString());
+    // }
   }
 
 

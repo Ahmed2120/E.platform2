@@ -23,7 +23,7 @@ mixin DegreeModel on Model{
     try {
       var response = await CallApi().
       getWithBody(data, "/api/Student/GetStudentDegrees", 1);
-        print(json.decode(response.body));
+        print('00000000000000000000000000');
       if (response != null && response.statusCode == 200) {
         List body = json.decode(response.body);
         _degreeList=body.map((e) => Degree.fromJson(e)).toList();

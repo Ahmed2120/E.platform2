@@ -38,6 +38,9 @@ class TeacherCreateExamPage extends StatefulWidget {
 }
 
 class _TeacherCreateExamPageState extends State<TeacherCreateExamPage> {
+
+  final _formKey = GlobalKey<FormState>();
+
   CustomModel? subject;
   List<CustomModel> _subjects=[];
   CustomModel? day;
@@ -53,6 +56,14 @@ class _TeacherCreateExamPageState extends State<TeacherCreateExamPage> {
 
   List <SelectedCurrency>_selectedCurrencies=[];
   List <CustomQuestion>_questions=[];
+
+  List<CustomModel?> selectedEducationTypeList = [null];
+  List<List<CustomModel>?> curriculumTypeList = [null];
+  List<CustomModel?> selectedCurriculumTypeList = [null];
+  List<List<CustomModel>?> gradesList = [null];
+  List<CustomModel?> selectedGradesList = [null];
+  List<List<CustomModel>?> subjectList = [null];
+  List<CustomModel?> selectedSubjectList = [null];
 
   bool _type_loading=false;
   bool _level_loading=false;
@@ -92,9 +103,7 @@ class _TeacherCreateExamPageState extends State<TeacherCreateExamPage> {
     super.initState();
 
     _get_educationType();
-    _get_educationLevels();
     _getCountry();
-    _getSubOfTeacher();
   }
 
   @override
@@ -104,110 +113,173 @@ class _TeacherCreateExamPageState extends State<TeacherCreateExamPage> {
     return Scaffold(
       body: CustomStack(
         pageTitle: 'انشاء اختبار',
-        child: ListView(
-          shrinkWrap: true,
-          children: [
-            Row(
-              children: [
-                Expanded(child: CustomDropDown(_subjects, changeSubject, subject, 'المادة')),
-                const SizedBox(width: 8,),
-                Expanded(child: CustomDropDown(_levels,
-                    selectLevel, educationLevel
-                    , 'المرحلة الدراسية')),
-              ],
-            ),
-            const SizedBox(height: 5,),
-            Row(
-              children: [
-                Expanded(child: CustomDropDown(_educationTypes, selectEducationType, educationType, 'نوع التعليم')),
-                const SizedBox(width: 8,),
-                Expanded(child: CustomDropDown(_educationPrograms, selectProgramType, programType, 'نوع المنهج')),
-              ],
-            ),
+        child: Form(
+          key: _formKey ,
+          child: ListView(
+            shrinkWrap: true,
+            children: [
+              ListView.separated(
+                  physics: const NeverScrollableScrollPhysics(),
+                  shrinkWrap: true,
+                  itemCount: curriculumTypeList.length,
+                  separatorBuilder: (context, index)=> const SizedBox(height: 10,),
+                  itemBuilder: (context, index) {
+                    return Row(
+                      children: [
+                        Expanded(
+                          child: Column(
+                            children: [
+                              Row(
+                                children: [
+                                  Expanded(
+                                    child: CustomDropDown(_educationTypes, (val){
+                                      selectEducationType(val, index);
+                                    }, selectedEducationTypeList[index], 'نوع التعليم'),
+                                  ),
 
-            const SizedBox(height: 5,),
-            Text('عنوان الاختبار', style: Theme.of(context).textTheme.titleMedium, textAlign: TextAlign.right,),
-            CustomTextField(controller: _examTitleController, hintText: 'عنوان الاختبار', input: TextInputType.text),
+                                  const SizedBox(width: 5,),
+                                  if(curriculumTypeList[index] != null && curriculumTypeList[index]!.isNotEmpty)
+                                    Expanded(
+                                      child: CustomDropDown(curriculumTypeList[index]!,
+                                              (val){
+                                            selectProgramType(val, index);
+                                          }, selectedCurriculumTypeList[index], 'نوع المنهج'),
+                                    ),
+                                ],
+                              ),
+                              const SizedBox(height: 5,),
+                              Row(
+                                children: [
+                                  if(gradesList[index] != null && gradesList[index]!.isNotEmpty)
+                                    Expanded(
+                                      child: CustomDropDown(gradesList[index]!, (val){
+                                        selectLevel(val, index);
+                                      }, selectedGradesList[index], 'السنة الدراسية'),
+                                    ),
 
-            const SizedBox(height: 5,),
-            Text('مدة الاختبار', style: Theme.of(context).textTheme.titleMedium, textAlign: TextAlign.right,),
-            CustomTextField(controller: _timeController, hintText: 'المدة', input: TextInputType.number,),
-            const SizedBox(height: 5,),
-            CustomMultiSelectDropDown(countries, _selectedCountries, selectCountries, 'دول العرض'),
-            const SizedBox(height: 5,),
-            Text('سعر الاختبار', style: Theme.of(context).textTheme.titleMedium, textAlign: TextAlign.right,),
-            _currency_loading?const Center(child: CircularProgressIndicator())
-                :ListView.separated(
-              physics: const NeverScrollableScrollPhysics(),
-              shrinkWrap: true,
-              itemCount: _selectedCurrencies.length,
-              separatorBuilder: (context, index) => const SizedBox(
-                height: 10,
+                                  const SizedBox(width: 5,),
+                                  if(subjectList[index] != null && subjectList[index]!.isNotEmpty)
+                                    Expanded(
+                                      child: CustomDropDown(subjectList[index]!,
+                                              (val){
+                                            changeSubject(val, index);
+                                          }, selectedSubjectList[index], 'المادة'),
+                                    ),
+                                ],
+                              )
+                            ],
+                          ),
+                        ),
+
+                        const SizedBox(width: 10,),
+                        if(index == curriculumTypeList.length - 1)
+                          InkWell(
+                              onTap: ()
+                              {
+                                curriculumTypeList.add(null);
+                                selectedEducationTypeList.add(null);
+                                selectedCurriculumTypeList.add(null);
+                                gradesList.add(null);
+                                selectedGradesList.add(null);
+                                subjectList.add(null);
+                                selectedSubjectList.add(null);
+                                setState(() {});
+                              },
+                              child: const Icon(Icons.add_circle_sharp,
+                                color: AppColors.primaryColor, size: 40,))
+                      ],
+                    );
+                  }
               ),
-              itemBuilder: (context, index)=> Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(_selectedCurrencies[index].Name, style: Theme.of(context).textTheme.bodySmall,),
-                  SizedBox(
-                    width: 100,
-                    child: ChangeValueField(hintText: 'السعر',
-                      onChange: (value){
-                        //   currencies[index] = value;
-                        _selectedCurrencies[index].value= value==null ? 0.0
-                            : double.parse(value);
-                        setState(() {
 
-                        });
-                      },input:  TextInputType.number,
-                    ),
-                  )
-                ],
-              ),
-            ),
-            const SizedBox(height: 8,),
-            ScopedModelDescendant<MainModel>(
-                builder:(context,child,MainModel model){
-                return Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text('الاسئلة', style: Theme.of(context).textTheme.titleMedium, textAlign: TextAlign.right,),
-                    IconButton(onPressed: ()=> GlobalMethods.navigate(context, TeacherQuestBankPage(model: model,)), icon: Icon(Icons.add_circle_outlined), color: AppColors.primaryColor, iconSize: 25,)
-                  ],
-                );
-              }
-            ),
-            _questLoading?const Center(child: CircularProgressIndicator())
-                :ListView.separated(
+              const SizedBox(height: 5,),
+              Text('عنوان الاختبار', style: Theme.of(context).textTheme.titleMedium, textAlign: TextAlign.right,),
+              CustomTextField(controller: _examTitleController, hintText: 'عنوان الاختبار', input: TextInputType.text),
+
+              const SizedBox(height: 5,),
+              Text('مدة الاختبار', style: Theme.of(context).textTheme.titleMedium, textAlign: TextAlign.right,),
+              CustomTextField(controller: _timeController, hintText: 'المدة', input: TextInputType.number,),
+              const SizedBox(height: 5,),
+              CustomMultiSelectDropDown(countries, _selectedCountries, selectCountries, 'دول العرض'),
+              const SizedBox(height: 5,),
+              Text('سعر الاختبار', style: Theme.of(context).textTheme.titleMedium, textAlign: TextAlign.right,),
+              _currency_loading?const Center(child: CircularProgressIndicator())
+                  :ListView.separated(
                 physics: const NeverScrollableScrollPhysics(),
                 shrinkWrap: true,
-                itemCount: _questions.length,
-                separatorBuilder: (context, index)=> const SizedBox(height: 10,),
-                itemBuilder: (context, index) {
-                  return CheckboxListTile(
-                    title: Text(_questions[index].Text!, style: Theme.of(context).textTheme.bodySmall,),
-                      value: _questions[index].Selected, onChanged: (val){
-                    _questions[index].Selected = val!;
-                    setState(() {});
-                  });
+                itemCount: _selectedCurrencies.length,
+                separatorBuilder: (context, index) => const SizedBox(
+                  height: 10,
+                ),
+                itemBuilder: (context, index)=> Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(_selectedCurrencies[index].Name, style: Theme.of(context).textTheme.bodySmall,),
+                    SizedBox(
+                      width: 100,
+                      child: ChangeValueField(hintText: 'السعر',
+                        onChange: (value){
+                          //   currencies[index] = value;
+                          _selectedCurrencies[index].value= value==null ? 0.0
+                              : double.parse(value);
+                          setState(() {
+
+                          });
+                        },input:  TextInputType.number,
+                      ),
+                    )
+                  ],
+                ),
+              ),
+              const SizedBox(height: 8,),
+              ScopedModelDescendant<MainModel>(
+                  builder:(context,child,MainModel model){
+                  return Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text('الاسئلة', style: Theme.of(context).textTheme.titleMedium, textAlign: TextAlign.right,),
+                      IconButton(onPressed: ()=> GlobalMethods.navigate(context, TeacherQuestBankPage(model: model,)), icon: Icon(Icons.add_circle_outlined), color: AppColors.primaryColor, iconSize: 25,)
+                    ],
+                  );
                 }
-            ),
+              ),
+              _questLoading?const Center(child: CircularProgressIndicator())
+                  :ListView.separated(
+                  physics: const NeverScrollableScrollPhysics(),
+                  shrinkWrap: true,
+                  itemCount: _questions.length,
+                  separatorBuilder: (context, index)=> const SizedBox(height: 10,),
+                  itemBuilder: (context, index) {
+                    return CheckboxListTile(
+                      title: Text(_questions[index].Text!, style: Theme.of(context).textTheme.bodySmall,),
+                        value: _questions[index].Selected, onChanged: (val){
+                      _questions[index].Selected = val!;
+                      setState(() {});
+                    });
+                  }
+              ),
 
-            const SizedBox(height: 20,),
-            _create_Loading ? const Center(child: CircularProgressIndicator(),)
-                : CustomElevatedButton(title: 'انشاء الاختبار', function:() {
-              if (validates()) _addExam();
-            }),
-            const SizedBox(height: 15,),
+              const SizedBox(height: 20,),
+              _create_Loading ? const Center(child: CircularProgressIndicator(),)
+                  : CustomElevatedButton(title: 'انشاء الاختبار', function:() {
+                    for(int  i = 0; i < _selectedCurrencies.length; i++){
+                      print(_selectedCurrencies[i].value);
+                    }
+                if (validates()) _addExam();
+              }),
+              const SizedBox(height: 15,),
 
-          ],
+            ],
+          ),
         ),
       ),
     );
   }
 
-  changeSubject(val){
-    subject = val;
-    if(subject != null && educationType != null && educationLevel != null){
+  changeSubject(val, index){
+    selectedSubjectList[index] = val;
+
+    if(checkLists){
       _getQuestions();
     }
   }
@@ -218,21 +290,42 @@ class _TeacherCreateExamPageState extends State<TeacherCreateExamPage> {
     time = val;
   }
 
-  selectLevel(val){
+
+  selectLevel(val, index) async{
     educationLevel = val;
-    if(subject != null && educationType != null && educationLevel != null){
+    selectedGradesList[index] = val;
+    await _getSubOfTeacher(selectedEducationTypeList[index]!.Id, selectedGradesList[index]!.Id, selectedCurriculumTypeList[index]?.Id);
+    subjectList[index] = _subjects;
+
+    if(checkLists){
       _getQuestions();
     }
   }
-  selectEducationType(val){
+
+  selectEducationType(val, index) async{
     educationType = val;
-    _getEducationPrograms();
-    if(subject != null && educationType != null && educationLevel != null){
+    selectedEducationTypeList[index] = val;
+    await _getEducationPrograms(selectedEducationTypeList[index]!.Id);
+    curriculumTypeList[index] = _educationPrograms;
+
+    if(curriculumTypeList[index]!.isEmpty){
+      await _get_educationLevels(educationType!.Id, null);
+      gradesList[index] = _levels;
+    }
+    if(checkLists){
       _getQuestions();
     }
   }
-  selectProgramType(val){
-    programType = val;
+
+  selectProgramType(val, index) async{
+    selectedCurriculumTypeList[index] = val;
+
+    await _get_educationLevels(selectedEducationTypeList[index]!.Id, selectedCurriculumTypeList[index]!.Id);
+    gradesList[index] = _levels;
+
+    if(checkLists){
+      _getQuestions();
+    }
   }
   selectCountries(val){
     _selectedCountries = val;
@@ -269,18 +362,18 @@ class _TeacherCreateExamPageState extends State<TeacherCreateExamPage> {
       _type_loading=false;
     });
   }
-  void _getEducationPrograms() async{
+  Future _getEducationPrograms(int educationTypeId) async{
 
     setState(() {
       _educationProgramsLoading=true;
     });
     Map <String, dynamic>data={
-      "educationTypeId" :educationType!.Id.toString()
+      "educationTypeId" :educationTypeId.toString()
     };
 
     try {
       var response = await CallApi().getWithBody(data,
-          "/api/EducationProgram/GetEducationPrograms",1);
+          "/api/EducationProgram/GetEducationPrograms",0);
       List body =json.decode(response.body) ;
       if (response != null && response.statusCode == 200) {
         _educationPrograms=body.map((e) => CustomModel.fromJson(e)).toList();
@@ -300,15 +393,20 @@ class _TeacherCreateExamPageState extends State<TeacherCreateExamPage> {
     }
 
   }
-  void _get_educationLevels() async{
+  Future _get_educationLevels(int educationTypeId, int? programTypeId) async{
 
     setState(() {
       _level_loading=true;
     });
 
+    Map <String, dynamic>data={
+      "educationTypeId" :educationTypeId.toString(),
+      "programTypeId" : programTypeId.toString()
+    };
 
     try {
-      var response = await CallApi().getData("/api/Teacher/GetTeacherGrades",1);
+      var response = await CallApi().getWithBody(data,
+          "/api/Grade/GetGradesByEducationProgramType",0);
 
       if (response != null && response.statusCode == 200) {
         List body =json.decode(response.body) ;
@@ -392,15 +490,18 @@ class _TeacherCreateExamPageState extends State<TeacherCreateExamPage> {
     }
 
   }
-  void _getSubOfTeacher()  async{
+  Future _getSubOfTeacher(int educationTypeId, int gradeId, int? programTypeId)  async{
     setState(() {
       _subLoading=true;
     });
-    Map<String,dynamic> data={
-      'teacherId':null
+    Map <String, dynamic>data={
+      "educationTypeId" : educationTypeId.toString(),
+      "gradeId" : gradeId.toString(),
+      "programTypeId" : programTypeId.toString()
     };
     try {
-      var response = await CallApi().getWithBody(data, "/api/Teacher/GetTeacherSubjects", 1);
+      var response = await CallApi().getWithBody(data,
+          "/api/Subject/GetSubjects",0);
       print(json.decode(response.body));
       if (response != null && response.statusCode == 200) {
         List body = json.decode(response.body);
@@ -425,16 +526,43 @@ class _TeacherCreateExamPageState extends State<TeacherCreateExamPage> {
   }
 
   void _getQuestions()  async{
+    print('--------------------------------------------------');
     setState(() {
       _questLoading=true;
     });
+    List e = [];
+    for(int i = 0; i < selectedEducationTypeList.length; i++){
+      if(selectedEducationTypeList[i] != null){
+        e.add(selectedEducationTypeList[i]!.Id);
+      }
+    }
+    List p = [];
+    for(int i = 0; i < selectedCurriculumTypeList.length; i++){
+      if(selectedCurriculumTypeList[i] != null){
+        p.add(selectedCurriculumTypeList[i]!.Id);
+      }
+    }
+    List g = [];
+    for(int i = 0; i < selectedGradesList.length; i++){
+      if(selectedGradesList[i] != null){
+        g.add(selectedGradesList[i]!.Id);
+      }
+    }
+    List s = [];
+    for(int i = 0; i < selectedSubjectList.length; i++){
+      if(selectedSubjectList[i] != null){
+        s.add(selectedSubjectList[i]!.Id);
+      }
+    }
+
     Map<String,dynamic> data={
-      'subjectId':subject!.Id.toString(),
-      'educationTypeId':educationType!.Id.toString(),
-      'gradeId':educationLevel!.Id.toString()
+      "EducationTypeIds":e,
+      "ProgramTypeIds":p,
+      "GradeIds":g,
+      "SubjectIds":s
     };
     try {
-      var response = await CallApi().getWithBody(data, "/api/Question/GetQuestions", 1);
+      var response = await CallApi().postData(jsonEncode(data), "/api/Question/GetQuestions", 1);
       print(json.decode(response.body));
       if (response != null && response.statusCode == 200) {
         List body = json.decode(response.body);
@@ -493,14 +621,30 @@ final selectedQuest = _questions.where((element) => element.Selected).toList();
       });
     }
 
+    Map<String, String> types = {};
+    for(int i = 0; i < selectedEducationTypeList.length; i++){
+      if(selectedEducationTypeList[i] != null){
+        types['EducationTypeIds[$i]'] = selectedEducationTypeList[i]!.Id.toString();
+
+      }
+      if(selectedCurriculumTypeList[i] != null){
+        types['ProgramTypeIds[$i]'] = selectedCurriculumTypeList[i]!.Id.toString();
+      }
+      if(selectedGradesList[i] != null){
+        types['GradeIDs[$i]'] = selectedGradesList[i]!.Id.toString();
+      }
+      if(selectedSubjectList[i] != null){
+        types['SubjectIDs[$i]'] = selectedSubjectList[i]!.Id.toString();
+      }
+    }
+
     Map<String, String> data={
       "Id": "0",
-      "SubjectId": subject!.Id.toString(),
       "Title": _examTitleController.text,
-      "GradeId": educationLevel!.Id.toString(),
-      "EducationTypeId": educationType!.Id.toString(),
-      "ProgramTypeId": programType!.Id.toString(),
-      "ExamTime": _timeController.text,
+      "CourseId": widget.courseId.toString(),
+      "GroupId": widget.groupId.toString(),
+      ...types,
+      "ExamDuration": _timeController.text,
       // "NotebookImages": _images,
       "Countries": jsonEncode(_countries),
       "Prices": jsonEncode(_examPrices),
@@ -517,7 +661,7 @@ final selectedQuest = _questions.where((element) => element.Selected).toList();
 
     try {
       // var response = await TeacherCall().postData(json.encode(data), "/api/Notebook/AddNotebook", 1);
-      StreamedResponse response = await CallApi().postJsonAndFile(data, [], "/api/Exam/AddExam", 1, parameters: params);
+      StreamedResponse response = await CallApi().postJsonAndFile(data, [], "/api/Exam/AddExam", 1);
       // var body = json.decode(response.body);
       print ('body '+ await response.stream.bytesToString());
 
@@ -551,10 +695,10 @@ final selectedQuest = _questions.where((element) => element.Selected).toList();
       ShowMyDialog.showMsg('ضع مدة للاختبار');
       return false;
     }
-    if(subject == null || educationType == null || educationLevel == null || programType == null) {
-      ShowMyDialog.showMsg('املاء جميع الحقول');
-      return false;
-    }
+    // if(subject == null || educationType == null || educationLevel == null || programType == null) {
+    //   ShowMyDialog.showMsg('املاء جميع الحقول');
+    //   return false;
+    // }
     if(_questions.every((element) => !element.Selected)) {
       ShowMyDialog.showMsg('اختر اسئلة');
       return false;
@@ -564,6 +708,16 @@ final selectedQuest = _questions.where((element) => element.Selected).toList();
       return false;
     }
     return true;
+  }
+
+  bool get checkLists{
+    if(selectedEducationTypeList[0] != null
+        && selectedCurriculumTypeList[0] !=null
+        && selectedGradesList[0] !=null
+        && selectedSubjectList[0] !=null){
+      return true;
+    }
+    return false;
   }
 
 }

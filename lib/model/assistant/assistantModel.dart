@@ -277,6 +277,7 @@ notifyListeners();
 
       if (response != null && response.statusCode == 200) {
         ShowMyDialog.showMsg("تم ارسال الطلب");
+        _assistantTeachers.firstWhere((e) => e.Id == teacherId).status = 1;
       }
       else {
         ShowMyDialog.showMsg(response.reasonPhrase);

@@ -21,7 +21,7 @@ class Degree{
   factory  Degree.fromJson(Map<String, dynamic> json)=>
       Degree (
         Id :json['Id'] ,
-        SubjectName : json['SubjectName'],
+        SubjectName : json['SubjectName']??'',
         ExamTitle : json['ExamTitle'],
         ExamDegree : json['ExamDegree'],
         SubjectImage : json['SubjectImage'] ==null ? 'assets/images/english.png'  :

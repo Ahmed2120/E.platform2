@@ -39,7 +39,7 @@ mixin CreatedTeacherCoursesModel on Model{
       'ProgramTypeId':ProgramTypeId.toString()
     };
 
-    try {
+    // try {
       var response = await CallApi().getWithBody(data,"/api/Course/ShowTeacherAllCourses", 1);
       print ("courses "+response.body);
       if (response != null && response.statusCode == 200) {
@@ -52,12 +52,12 @@ mixin CreatedTeacherCoursesModel on Model{
       }
       _Loading=false;
       notifyListeners();
-    }
-    catch(e){
-      _Loading=false;
-      notifyListeners();
-      print('courses ee '+e.toString());
-    }
+    // }
+    // catch(e){
+    //   _Loading=false;
+    //   notifyListeners();
+    //   print('courses ee '+e.toString());
+    // }
 
 
 
